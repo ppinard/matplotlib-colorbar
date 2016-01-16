@@ -25,7 +25,7 @@ Easiest way to install using ``pip``::
     
 For development installation from the git repository::
 
-    $ git pull 
+    $ git clone git@github.com:ppinard/matplotlib-colorbar.git
     $ pip install -e matplotlib-colorbar
 
 Example
