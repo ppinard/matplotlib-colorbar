@@ -3,13 +3,13 @@ matplotlib-colorbar
 
 .. image:: https://travis-ci.org/ppinard/matplotlib-colorbar.svg
    :target: https://travis-ci.org/ppinard/matplotlib-colorbar
-   
+
 .. image:: https://badge.fury.io/py/matplotlib-colorbar.svg
    :target: http://badge.fury.io/py/matplotlib-colorbar
 
-Provides a new artist for matplotlib to display a colorbar, 
+Provides a new artist for matplotlib to display a colorbar,
 instead of an axis as it is the default in matplotlib.
-The position of the colorbar artist can be decided as for the legend. 
+The position of the colorbar artist can be decided as for the legend.
 
 .. image:: https://raw.githubusercontent.com/ppinard/matplotlib-colorbar/master/doc/example1.png
 
@@ -22,7 +22,7 @@ Installation
 Easiest way to install using ``pip``::
 
     $ pip install matplotlib-colorbar
-    
+
 For development installation from the git repository::
 
     $ git clone git@github.com:ppinard/matplotlib-colorbar.git
@@ -43,27 +43,27 @@ Here is an example how to add a scale bar::
    >>> colorbar = ColorBar(mappable, location='lower left')
    >>> plt.gca().add_artist(colorbar)
    >>> plt.show()
-   
+
 matplotlibrc parameters
 -----------------------
 
 Here are parameters that can either be customized in the constructor of the
 **ColorBar** class or in the matplotlibrc file.
 
-  * ``mappable``: scalar mappable object which implements the methods 
+  * ``mappable``: scalar mappable object which implements the methods
     *get_cmap* and *get_array*
     (default: ``None``, the mappable can be specified later)
-  * ``label``: label on top of the color bar 
+  * ``label``: label on top of the color bar
     (default: ``None``, no label is shown)
   * ``orientation``: orientation, ``vertical`` or ``horizontal``
     (default: ``vertical``)
   * ``nbins``: number of color division in the color bar (default: or 50)
-  * ``length_fraction``: length of the color bar as a fraction of the 
-    axes's width (horizontal) or height (vertical) depending on the 
+  * ``length_fraction``: length of the color bar as a fraction of the
+    axes's width (horizontal) or height (vertical) depending on the
     orientation (default: ``0.2``)
-  * ``width_fraction``: width of the color bar as a fraction of the 
+  * ``width_fraction``: width of the color bar as a fraction of the
     axes's height (horizontal) or width (vertical) depending on the
-    orientation (default: ``0.02``
+    orientation (default: ``0.02``)
   * ``location``: a location code (same as legend) (default: ``upper right``)
   * ``pad``: fraction of the font size (default: ``0.2``)
   * ``border_pad``: fraction of the font size (default: ``0.1``)
@@ -72,8 +72,11 @@ Here are parameters that can either be customized in the constructor of the
   * ``color``: color for the tick text and label (default: ``k``)
   * ``box_color``: color of the box (if *frameon*) (default: ``w``)
   * ``box_alpha``: transparency of box (default: ``1.0``)
-  * ``font_properties``: a matplotlib.font_manager.FontProperties instance, 
+  * ``font_properties``: a matplotlib.font_manager.FontProperties instance,
     optional sets the font properties for the label text
+  * ``ticksteps``: a list of ticks to show as fraction from ``0`` to ``1``
+    (default: ``[0.0, 1.0]`` for minimal and maximal values)
+  * ``ticklabels``: a list of tick labels (same length as ``ticksteps`` argument)
 
 License
 -------

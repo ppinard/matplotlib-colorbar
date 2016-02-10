@@ -18,6 +18,7 @@ from nose.tools import \
 # Local modules.
 from matplotlib_colorbar.colorbar import ColorBar
 
+
 # Globals and constants variables.
 
 def create_figure():
@@ -32,10 +33,12 @@ def create_figure():
 
     return fig, ax, colorbar
 
+
 @cleanup
 def test_colorbar_draw():
     create_figure()
     plt.draw()
+
 
 @cleanup
 def test_colorbar_label():
@@ -54,6 +57,7 @@ def test_colorbar_label():
 
     plt.draw()
 
+
 @cleanup
 def test_colorbar_orientation():
     _fig, _ax, colorbar = create_figure()
@@ -71,6 +75,7 @@ def test_colorbar_orientation():
 
     assert_raises(ValueError, colorbar.set_orientation, 'blah')
 
+
 @cleanup
 def test_colorbar_nbins():
     _fig, _ax, colorbar = create_figure()
@@ -87,6 +92,7 @@ def test_colorbar_nbins():
     assert_equal(25, colorbar.nbins)
 
     assert_raises(ValueError, colorbar.set_nbins, 0)
+
 
 @cleanup
 def test_colorbar_length_fraction():
@@ -106,6 +112,7 @@ def test_colorbar_length_fraction():
     assert_raises(ValueError, colorbar.set_length_fraction, 0.0)
     assert_raises(ValueError, colorbar.set_length_fraction, 1.1)
 
+
 @cleanup
 def test_colorbar_width_fraction():
     _fig, _ax, colorbar = create_figure()
@@ -124,6 +131,7 @@ def test_colorbar_width_fraction():
     assert_raises(ValueError, colorbar.set_width_fraction, 0.0)
     assert_raises(ValueError, colorbar.set_width_fraction, 1.1)
 
+
 @cleanup
 def test_colorbar_location():
     _fig, _ax, colorbar = create_figure()
@@ -138,6 +146,7 @@ def test_colorbar_location():
     colorbar.location = 'lower left'
     assert_equal(3, colorbar.get_location())
     assert_equal(3, colorbar.location)
+
 
 @cleanup
 def test_colorbar_pad():
@@ -154,6 +163,7 @@ def test_colorbar_pad():
     assert_almost_equal(5, colorbar.get_pad())
     assert_almost_equal(5, colorbar.pad)
 
+
 @cleanup
 def test_colorbar_border_pad():
     _fig, _ax, colorbar = create_figure()
@@ -168,6 +178,7 @@ def test_colorbar_border_pad():
     colorbar.border_pad = 5
     assert_almost_equal(5, colorbar.get_border_pad())
     assert_almost_equal(5, colorbar.border_pad)
+
 
 @cleanup
 def test_colorbar_sep():
@@ -184,6 +195,7 @@ def test_colorbar_sep():
     assert_almost_equal(5, colorbar.get_sep())
     assert_almost_equal(5, colorbar.sep)
 
+
 @cleanup
 def test_colorbar_frameon():
     _fig, _ax, colorbar = create_figure()
@@ -198,6 +210,45 @@ def test_colorbar_frameon():
     colorbar.frameon = False
     assert_false(colorbar.get_frameon())
     assert_false(colorbar.frameon)
+
+
+@cleanup
+def test_colorbar_ticksteps():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_ticksteps())
+    assert_is_none(colorbar.ticksteps)
+
+    colorbar.set_ticksteps([0., 0.5, 1.])
+    assert_equal([0., 0.5, 1.], colorbar.get_ticksteps())
+    assert_equal([0., 0.5, 1.], colorbar.ticksteps)
+
+    colorbar.ticksteps = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.get_ticksteps())
+    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.ticksteps)
+
+    assert_raises(ValueError, colorbar.set_ticksteps, [-1, 1])
+    assert_raises(ValueError, colorbar.set_ticksteps, [0., 0.5, 1.5])
+
+
+@cleanup
+def test_colorbar_ticklabels():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_ticklabels())
+    assert_is_none(colorbar.ticklabels)
+
+    colorbar.set_ticklabels(['min', 'max'])
+    assert_equal(['min', 'max'], colorbar.get_ticklabels())
+    assert_equal(['min', 'max'], colorbar.ticklabels)
+
+    colorbar.ticklabels = ['small', 'big']
+    assert_equal(['small', 'big'], colorbar.get_ticklabels())
+    assert_equal(['small', 'big'], colorbar.ticklabels)
+
+    colorbar.ticksteps = [0., 1.]
+    assert_raises(ValueError, colorbar.set_ticklabels, ['one label', ])
+
 
 if __name__ == '__main__':
     import nose

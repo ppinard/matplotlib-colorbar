@@ -24,9 +24,11 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.color
     - colorbar.box_color
     - colorbar.box_alpha
-    
-See the class documentation (:class:`.ColorBar`) for a description of the 
-parameters. 
+    - colorbar.ticksteps
+    - colorbar.ticklabels
+
+See the class documentation (:class:`.ColorBar`) for a description of the
+parameters.
 """
 
 # Standard library modules.
@@ -36,7 +38,7 @@ import imp
 # Third party modules.
 from matplotlib.rcsetup import \
     (defaultParams, ValidateInStrings, validate_int, validate_float,
-     validate_legend_loc, validate_bool, validate_color)
+     validate_legend_loc, validate_bool, validate_color, validate_floatlist)
 from matplotlib.artist import Artist
 from matplotlib.cbook import is_string_like
 from matplotlib.offsetbox import \
@@ -69,10 +71,12 @@ defaultParams.update(
      'colorbar.color': ['k', validate_color],
      'colorbar.box_color': ['w', validate_color],
      'colorbar.box_alpha': [1.0, validate_float],
+     'colorbar.ticksteps': [[0., 1.], validate_floatlist],
      })
 
 # Reload matplotlib to reset the default parameters
 imp.reload(sys.modules['matplotlib'])
+
 
 class ColorBar(Artist):
 
@@ -87,18 +91,17 @@ class ColorBar(Artist):
                   'center right': 7,
                   'lower center': 8,
                   'upper center': 9,
-                  'center':       10,
-              }
+                  'center':       10}
 
     def __init__(self, mappable=None, label=None, orientation=None, nbins=None,
                  length_fraction=None, width_fraction=None,
                  location=None, pad=None, border_pad=None, sep=None,
                  frameon=None, color=None, box_color=None, box_alpha=None,
-                 font_properties=None):
+                 font_properties=None, ticksteps=None, ticklabels=None):
         """
         Creates a new color bar.
-        
-        :arg mappable: scalar mappable object which implements the methods: 
+
+        :arg mappable: scalar mappable object which implements the methods:
             :meth:`get_cmap` and :meth:`get_array`
             (default: ``None``, the mappable can be specified later)
         :arg label: label on top of the color bar
@@ -107,10 +110,10 @@ class ColorBar(Artist):
             (default: rcParams['colorbar.orientation'] or ``vertical``)
         :arg nbins: number of color division in the color bar
             (default: rcParams['colorbar.nbins'] or 50)
-        :arg length_fraction: length of the color bar as a fraction of the 
-            axes's width (horizontal) or height (vertical) depending on the 
+        :arg length_fraction: length of the color bar as a fraction of the
+            axes's width (horizontal) or height (vertical) depending on the
             orientation (default: rcParams['colorbar.length_fraction'] or ``0.2``)
-        :arg width_fraction: width of the color bar as a fraction of the 
+        :arg width_fraction: width of the color bar as a fraction of the
             axes's height (horizontal) or width (vertical) depending on the
             orientation (default: rcParams['colorbar.width_fraction'] or ``0.02``
         :arg location: a location code (same as legend)
@@ -129,8 +132,12 @@ class ColorBar(Artist):
             (default: rcParams['colorbar.box_color'] or ``w``)
         :arg box_alpha: transparency of box
             (default: rcParams['colorbar.box_alpha'] or ``1.0``)
-        :arg font_properties: a matplotlib.font_manager.FontProperties instance, 
+        :arg font_properties: a matplotlib.font_manager.FontProperties instance,
             optional sets the font properties for the label text
+        :arg ticksteps: a list of ticks to show as fraction from ``0`` to ``1``
+            (default: rcParams['colorbar.tickstep'] or ``[0.0, 1.0]`` for minimal
+            and maximal values)
+        :arg ticklabels: a list of tick labels (same length as ``ticksteps`` argument)
         """
         Artist.__init__(self)
 
@@ -149,6 +156,8 @@ class ColorBar(Artist):
         self.box_color = box_color
         self.box_alpha = box_alpha
         self.font_properties = FontProperties(font_properties)
+        self.ticksteps = ticksteps
+        self.ticklabels = ticklabels
 
     def draw(self, renderer, *args, **kwargs):
         if not self.get_visible():
@@ -157,7 +166,7 @@ class ColorBar(Artist):
             return
 
         # Get parameters
-        from matplotlib import rcParams # late import
+        from matplotlib import rcParams  # late import
 
         cmap = self.mappable.get_cmap()
         array = self.mappable.get_array()
@@ -180,6 +189,9 @@ class ColorBar(Artist):
         box_color = self.box_color or rcParams.get('colorbar.box_color', 'w')
         box_alpha = self.box_alpha or rcParams.get('colorbar.box_alpha', 1.0)
         font_properties = self.font_properties
+        ticksteps = self.ticksteps or \
+            rcParams.get('colorbar.ticksteps', [0.0, 1.0])
+        ticklabels = self.ticklabels
 
         ax = self.axes
         children = []
@@ -222,30 +234,32 @@ class ColorBar(Artist):
         # Create ticks
         tickbox = AuxTransformBox(ax.transData)
 
-        if orientation == 'horizontal':
-            x0 = 0; x1 = length
-            y0 = y1 = 0
-            ha = 'center'
-            va = 'top'
-        else:
-            x0 = x1 = width
-            y0 = 0; y1 = length
-            ha = 'left'
-            va = 'center'
+        for itick, tickstep in enumerate(ticksteps):
 
-        tick0 = Text(x0, y0, values[0],
-                     color=color,
-                     fontproperties=font_properties,
-                     horizontalalignment=ha,
-                     verticalalignment=va)
-        tickbox.add_artist(tick0)
+            # Tick label
+            if ticklabels:
+                value = ticklabels[itick]
+            else:
+                idx = int(round(tickstep * (len(values) - 1)))
+                value = values[idx]
 
-        tick1 = Text(x1, y1, values[-1],
-                     color=color,
-                     fontproperties=font_properties,
-                     horizontalalignment=ha,
-                     verticalalignment=va)
-        tickbox.add_artist(tick1)
+            if orientation == 'horizontal':
+                tickx = tickstep * length
+                ticky = 0
+                ha = 'center'
+                va = 'top'
+            else:
+                tickx = width
+                ticky = tickstep * length
+                ha = 'left'
+                va = 'center'
+
+            ticktext = Text(tickx, ticky, value,
+                            color=color,
+                            fontproperties=font_properties,
+                            horizontalalignment=ha,
+                            verticalalignment=va)
+            tickbox.add_artist(ticktext)
 
         children.append(tickbox)
 
@@ -420,3 +434,26 @@ class ColorBar(Artist):
         self._font_properties = props
 
     font_properties = property(get_font_properties, set_font_properties)
+
+    def get_ticksteps(self):
+        return self._ticksteps
+
+    def set_ticksteps(self, ticksteps):
+        if ticksteps is not None:
+            if min(ticksteps) < 0.0 or max(ticksteps) > 1.0:
+                raise ValueError('Ticksteps must be between [0.0, 1.0]')
+        self._ticksteps = ticksteps
+
+    ticksteps = property(get_ticksteps, set_ticksteps)
+
+    def get_ticklabels(self):
+        return self._ticklabels
+
+    def set_ticklabels(self, ticklabels):
+        if ticklabels is not None:
+            if self.ticksteps and len(self.ticksteps) != len(ticklabels):
+                raise ValueError("Ticklabels must be the same length as "
+                                 "ticksteps")
+        self._ticklabels = ticklabels
+
+    ticklabels = property(get_ticklabels, set_ticklabels)
