@@ -236,7 +236,7 @@ class ColorBar(Artist):
             ticks = [minvalue, maxvalue]  # default
 
         if not ticklabels:
-            ticklabels = ticks.copy()  # tick label by default
+            ticklabels = ticks[:]  # tick label by default
 
         if minvalue not in ticks:  # little hack to get right layout position
             ticks.append(minvalue)
