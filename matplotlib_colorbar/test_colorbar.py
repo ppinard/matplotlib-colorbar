@@ -213,22 +213,19 @@ def test_colorbar_frameon():
 
 
 @cleanup
-def test_colorbar_ticksteps():
+def test_colorbar_ticks():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_ticksteps())
-    assert_is_none(colorbar.ticksteps)
+    assert_is_none(colorbar.get_ticks())
+    assert_is_none(colorbar.ticks)
 
-    colorbar.set_ticksteps([0., 0.5, 1.])
-    assert_equal([0., 0.5, 1.], colorbar.get_ticksteps())
-    assert_equal([0., 0.5, 1.], colorbar.ticksteps)
+    colorbar.set_ticks([0., 0.5, 1.])
+    assert_equal([0., 0.5, 1.], colorbar.get_ticks())
+    assert_equal([0., 0.5, 1.], colorbar.ticks)
 
-    colorbar.ticksteps = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.get_ticksteps())
-    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.ticksteps)
-
-    assert_raises(ValueError, colorbar.set_ticksteps, [-1, 1])
-    assert_raises(ValueError, colorbar.set_ticksteps, [0., 0.5, 1.5])
+    colorbar.ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.get_ticks())
+    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.ticks)
 
 
 @cleanup
@@ -246,7 +243,7 @@ def test_colorbar_ticklabels():
     assert_equal(['small', 'big'], colorbar.get_ticklabels())
     assert_equal(['small', 'big'], colorbar.ticklabels)
 
-    colorbar.ticksteps = [0., 1.]
+    colorbar.ticks = [0., 1.]
     assert_raises(ValueError, colorbar.set_ticklabels, ['one label', ])
 
 

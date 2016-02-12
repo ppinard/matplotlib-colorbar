@@ -24,7 +24,7 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.color
     - colorbar.box_color
     - colorbar.box_alpha
-    - colorbar.ticksteps
+    - colorbar.ticks
     - colorbar.ticklabels
 
 See the class documentation (:class:`.ColorBar`) for a description of the
@@ -38,7 +38,7 @@ import imp
 # Third party modules.
 from matplotlib.rcsetup import \
     (defaultParams, ValidateInStrings, validate_int, validate_float,
-     validate_legend_loc, validate_bool, validate_color, validate_floatlist)
+     validate_legend_loc, validate_bool, validate_color)
 from matplotlib.artist import Artist
 from matplotlib.cbook import is_string_like
 from matplotlib.offsetbox import \
@@ -71,7 +71,6 @@ defaultParams.update(
      'colorbar.color': ['k', validate_color],
      'colorbar.box_color': ['w', validate_color],
      'colorbar.box_alpha': [1.0, validate_float],
-     'colorbar.ticksteps': [[0., 1.], validate_floatlist],
      })
 
 # Reload matplotlib to reset the default parameters
@@ -97,7 +96,7 @@ class ColorBar(Artist):
                  length_fraction=None, width_fraction=None,
                  location=None, pad=None, border_pad=None, sep=None,
                  frameon=None, color=None, box_color=None, box_alpha=None,
-                 font_properties=None, ticksteps=None, ticklabels=None):
+                 font_properties=None, ticks=None, ticklabels=None):
         """
         Creates a new color bar.
 
@@ -134,10 +133,9 @@ class ColorBar(Artist):
             (default: rcParams['colorbar.box_alpha'] or ``1.0``)
         :arg font_properties: a matplotlib.font_manager.FontProperties instance,
             optional sets the font properties for the label text
-        :arg ticksteps: a list of ticks to show as fraction from ``0`` to ``1``
-            (default: rcParams['colorbar.tickstep'] or ``[0.0, 1.0]`` for minimal
-            and maximal values)
-        :arg ticklabels: a list of tick labels (same length as ``ticksteps`` argument)
+        :arg ticks: ticks location
+            (default: minimal and maximal values)
+        :arg ticklabels: a list of tick labels (same length as ``ticks`` argument)
         """
         Artist.__init__(self)
 
@@ -156,7 +154,7 @@ class ColorBar(Artist):
         self.box_color = box_color
         self.box_alpha = box_alpha
         self.font_properties = FontProperties(font_properties)
-        self.ticksteps = ticksteps
+        self.ticks = ticks
         self.ticklabels = ticklabels
 
     def draw(self, renderer, *args, **kwargs):
@@ -189,8 +187,7 @@ class ColorBar(Artist):
         box_color = self.box_color or rcParams.get('colorbar.box_color', 'w')
         box_alpha = self.box_alpha or rcParams.get('colorbar.box_alpha', 1.0)
         font_properties = self.font_properties
-        ticksteps = self.ticksteps or \
-            rcParams.get('colorbar.ticksteps', [0.0, 1.0])
+        ticks = self.ticks
         ticklabels = self.ticklabels
 
         ax = self.axes
@@ -217,6 +214,7 @@ class ColorBar(Artist):
             patches.append(patch)
 
         values = np.linspace(np.min(array), np.max(array), nbins)
+        minvalue, maxvalue = values[0], values[-1]
 
         col = PatchCollection(patches, cmap=cmap,
                               edgecolors='none')
@@ -234,27 +232,42 @@ class ColorBar(Artist):
         # Create ticks
         tickbox = AuxTransformBox(ax.transData)
 
-        for itick, tickstep in enumerate(ticksteps):
+        if ticks is None:
+            ticks = [minvalue, maxvalue]  # default
 
-            # Tick label
-            if ticklabels:
-                value = ticklabels[itick]
-            else:
-                idx = int(round(tickstep * (len(values) - 1)))
-                value = values[idx]
+        if not ticklabels:
+            ticklabels = ticks.copy()  # tick label by default
+
+        if minvalue not in ticks:  # little hack to get right layout position
+            ticks.append(minvalue)
+            ticklabels.append('')  # no label for this extra tick
+
+        if maxvalue not in ticks:  # little hack to get right layout position
+            ticks.append(maxvalue)
+            ticklabels.append('')  # no label for this extra tick
+
+        for itick, tick in enumerate(ticks):
+
+            if tick > maxvalue or tick < minvalue:
+                continue  # ignore it
+
+            # Fraction of colorbar depending of min and max values of colorbar
+            a = 1 / (maxvalue - minvalue)
+            b = -a * minvalue
+            tickfrac = a * tick + b
 
             if orientation == 'horizontal':
-                tickx = tickstep * length
+                tickx = tickfrac * length
                 ticky = 0
                 ha = 'center'
                 va = 'top'
             else:
                 tickx = width
-                ticky = tickstep * length
+                ticky = tickfrac * length
                 ha = 'left'
                 va = 'center'
 
-            ticktext = Text(tickx, ticky, value,
+            ticktext = Text(tickx, ticky, ticklabels[itick],
                             color=color,
                             fontproperties=font_properties,
                             horizontalalignment=ha,
@@ -435,25 +448,22 @@ class ColorBar(Artist):
 
     font_properties = property(get_font_properties, set_font_properties)
 
-    def get_ticksteps(self):
-        return self._ticksteps
+    def get_ticks(self):
+        return self._ticks
 
-    def set_ticksteps(self, ticksteps):
-        if ticksteps is not None:
-            if min(ticksteps) < 0.0 or max(ticksteps) > 1.0:
-                raise ValueError('Ticksteps must be between [0.0, 1.0]')
-        self._ticksteps = ticksteps
+    def set_ticks(self, ticks):
+        self._ticks = ticks
 
-    ticksteps = property(get_ticksteps, set_ticksteps)
+    ticks = property(get_ticks, set_ticks)
 
     def get_ticklabels(self):
         return self._ticklabels
 
     def set_ticklabels(self, ticklabels):
         if ticklabels is not None:
-            if self.ticksteps and len(self.ticksteps) != len(ticklabels):
+            if self.ticks and len(self.ticks) != len(ticklabels):
                 raise ValueError("Ticklabels must be the same length as "
-                                 "ticksteps")
+                                 "ticks")
         self._ticklabels = ticklabels
 
     ticklabels = property(get_ticklabels, set_ticklabels)

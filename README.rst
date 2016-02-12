@@ -74,9 +74,8 @@ Here are parameters that can either be customized in the constructor of the
   * ``box_alpha``: transparency of box (default: ``1.0``)
   * ``font_properties``: a matplotlib.font_manager.FontProperties instance,
     optional sets the font properties for the label text
-  * ``ticksteps``: a list of ticks to show as fraction from ``0`` to ``1``
-    (default: ``[0.0, 1.0]`` for minimal and maximal values)
-  * ``ticklabels``: a list of tick labels (same length as ``ticksteps`` argument)
+  * ``ticks``: ticks location (default: minimal and maximal values)
+  * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
 
 License
 -------
