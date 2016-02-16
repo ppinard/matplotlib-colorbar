@@ -82,4 +82,4 @@ License
 
 License under the BSD License, compatible with matplotlib.
 
-Copyright (c) 2015 Philippe Pinard
+Copyright (c) 2015-2016 Philippe Pinard and collaborators

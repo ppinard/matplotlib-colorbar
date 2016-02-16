@@ -7,19 +7,17 @@ import os
 from setuptools import setup, find_packages
 
 # Local modules.
+import versioneer
 
 # Globals and constants variables.
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(BASEDIR, 'VERSION')) as version_file:
-    version = version_file.read().strip()
-
 # Get the long description from the relevant file
-with open('README.rst', 'r') as f:
+with open(os.path.join(BASEDIR, 'README.rst'), 'r') as f:
     long_description = f.read()
 
 setup(name='matplotlib-colorbar',
-      version=version,
+      version=versioneer.get_version(),
       description='Artist for matplotlib to display a color bar',
       long_description=long_description,
 
@@ -49,6 +47,8 @@ setup(name='matplotlib-colorbar',
 
       zip_safe=True,
 
-      test_suite='nose.collector'
+      test_suite='nose.collector',
+
+      cmdclass=versioneer.get_cmdclass(),
 
      )
