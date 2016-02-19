@@ -61,6 +61,12 @@ def test_colorbar_label():
 @cleanup
 def test_colorbar_orientation():
     _fig, _ax, colorbar = create_figure()
+    assert_raises(ValueError, colorbar.set_orientation, 'blah')
+
+
+@cleanup
+def test_colorbar_orientation_vertical():
+    _fig, _ax, colorbar = create_figure()
 
     assert_is_none(colorbar.get_orientation())
     assert_is_none(colorbar.orientation)
@@ -73,7 +79,25 @@ def test_colorbar_orientation():
     assert_equal('vertical', colorbar.get_orientation())
     assert_equal('vertical', colorbar.orientation)
 
-    assert_raises(ValueError, colorbar.set_orientation, 'blah')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_orientation_horizontal():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_orientation())
+    assert_is_none(colorbar.orientation)
+
+    colorbar.set_orientation('horizontal')
+    assert_equal('horizontal', colorbar.get_orientation())
+    assert_equal('horizontal', colorbar.orientation)
+
+    colorbar.orientation = 'horizontal'
+    assert_equal('horizontal', colorbar.get_orientation())
+    assert_equal('horizontal', colorbar.orientation)
+
+    plt.draw()
 
 
 @cleanup
@@ -147,6 +171,8 @@ def test_colorbar_location():
     assert_equal(3, colorbar.get_location())
     assert_equal(3, colorbar.location)
 
+    assert_raises(ValueError, colorbar.set_location, 'blah')
+
 
 @cleanup
 def test_colorbar_pad():
@@ -178,6 +204,25 @@ def test_colorbar_border_pad():
     colorbar.border_pad = 5
     assert_almost_equal(5, colorbar.get_border_pad())
     assert_almost_equal(5, colorbar.border_pad)
+
+
+@cleanup
+def test_colorbar_box_alpha():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_box_alpha())
+    assert_is_none(colorbar.box_alpha)
+
+    colorbar.set_box_alpha(0.1)
+    assert_almost_equal(0.1, colorbar.get_box_alpha())
+    assert_almost_equal(0.1, colorbar.box_alpha)
+
+    colorbar.box_alpha = 0.2
+    assert_almost_equal(0.2, colorbar.get_box_alpha())
+    assert_almost_equal(0.2, colorbar.box_alpha)
+
+    assert_raises(ValueError, colorbar.set_box_alpha, -0.1)
+    assert_raises(ValueError, colorbar.set_box_alpha, 1.1)
 
 
 @cleanup
@@ -229,6 +274,12 @@ def test_colorbar_ticks():
 
 
 @cleanup
+def test_colorbar_ticks_nominimum():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_ticks([0.0, 2.0])
+    plt.draw()
+
+@cleanup
 def test_colorbar_ticklabels():
     _fig, _ax, colorbar = create_figure()
 
@@ -246,6 +297,19 @@ def test_colorbar_ticklabels():
     colorbar.ticks = [0., 1.]
     assert_raises(ValueError, colorbar.set_ticklabels, ['one label', ])
 
+
+@cleanup
+def test_colorbar_set_visible():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_visible(False)
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_no_mappable():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_mappable(False)
+    plt.draw()
 
 if __name__ == '__main__':
     import nose
