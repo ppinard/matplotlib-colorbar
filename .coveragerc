@@ -1,0 +1,2 @@
+[run]
+omit=matplotlib_colorbar/_version.py
