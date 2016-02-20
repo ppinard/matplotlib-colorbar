@@ -7,6 +7,9 @@ matplotlib-colorbar
 .. image:: https://badge.fury.io/py/matplotlib-colorbar.svg
    :target: http://badge.fury.io/py/matplotlib-colorbar
 
+.. image:: https://codecov.io/github/ppinard/matplotlib-colorbar/coverage.svg?branch=master
+   :target: https://codecov.io/github/ppinard/matplotlib-colorbar?branch=master
+
 Provides a new artist for matplotlib to display a colorbar,
 instead of an axis as it is the default in matplotlib.
 The position of the colorbar artist can be decided as for the legend.

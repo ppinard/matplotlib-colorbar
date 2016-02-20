@@ -8,11 +8,14 @@ python:
 - '3.4'
 before_install:
 - pip install --upgrade pip
+- pip install codecov
 install:
 - pip install --cache-dir $HOME/.pip-cache -r requirements.txt
 - python setup.py develop
 script:
 - nosetests
+after_success:
+- codecov
 notifications:
   email: false
 deploy:
