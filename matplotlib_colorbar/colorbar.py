@@ -169,23 +169,26 @@ class ColorBar(Artist):
         cmap = self.mappable.get_cmap()
         array = self.mappable.get_array()
         label = self.label
-        orientation = self.orientation or \
-            rcParams.get('colorbar.orientation', 'vertical')
-        nbins = self.nbins or rcParams.get('colorbar.nbins', 50)
-        length_fraction = self.length_fraction or \
-            rcParams.get('colorbar.length_fraction', 0.2)
-        width_fraction = self.width_fraction or \
-            rcParams.get('colorbar.width_fraction', 0.01)
-        location = self.location or \
-            self._LOCATIONS[rcParams.get('colorbar.location', 'upper right')]
-        pad = self.pad or rcParams.get('colorbar.pad', 0.2)
-        border_pad = self.border_pad or \
-            rcParams.get('colorbar.border_pad', 0.1)
-        sep = self.sep or rcParams.get('colorbar.sep', 5)
-        frameon = self.frameon or rcParams.get('colorbar.frameon', True)
-        color = self.color or rcParams.get('colorbar.color', 'k')
-        box_color = self.box_color or rcParams.get('colorbar.box_color', 'w')
-        box_alpha = self.box_alpha or rcParams.get('colorbar.box_alpha', 1.0)
+
+        def _get_value(attr, default):
+            value = getattr(self, attr)
+            if value is None:
+                value = rcParams.get('colorbar.' + attr, default)
+            return value
+        orientation = _get_value('orientation', 'vertical')
+        nbins = _get_value('nbins', 50)
+        length_fraction = _get_value('length_fraction', 0.2)
+        width_fraction = _get_value('width_fraction', 0.01)
+        location = _get_value('location', 'upper right')
+        if is_string_like(location):
+            location = self._LOCATIONS[location]
+        pad = _get_value('pad', 0.2)
+        border_pad = _get_value('border_pad', 0.1)
+        sep = _get_value('sep', 5)
+        frameon = _get_value('frameon', True)
+        color = _get_value('color', 'k')
+        box_color = _get_value('box_color', 'w')
+        box_alpha = _get_value('box_alpha', 1.0)
         font_properties = self.font_properties
         ticks = self.ticks
         ticklabels = self.ticklabels
