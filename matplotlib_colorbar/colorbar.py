@@ -287,7 +287,8 @@ class ColorBar(Artist):
             text = Text(0, 0, label,
                         fontproperties=font_properties,
                         verticalalignment=va,
-                        rotation=orientation)
+                        rotation=orientation,
+                        color=color)
             labelbox.add_artist(text)
 
             children.insert(0, labelbox)
