@@ -16,7 +16,7 @@ The position of the colorbar artist can be decided as for the legend.
 
 .. image:: https://raw.githubusercontent.com/ppinard/matplotlib-colorbar/master/doc/example1.png
 
-The artist supports customization either directly from the *ColorBar* object or
+The artist supports customization either directly from the *Colorbar* object or
 from the matplotlibrc.
 
 Installation
@@ -39,11 +39,11 @@ Here is an example how to add a scale bar::
    >>> import numpy as np
    >>> import matplotlib.pyplot as plt
    >>> import matplotlib.cbook as cbook
-   >>> from matplotlib_colorbar.colorbar import ColorBar
+   >>> from matplotlib_colorbar.colorbar import Colorbar
    >>> plt.figure()
    >>> data = np.array(plt.imread(cbook.get_sample_data('grace_hopper.png')))
    >>> mappable = plt.imshow(data[...,0], cmap='viridis')
-   >>> colorbar = ColorBar(mappable, location='lower left')
+   >>> colorbar = Colorbar(mappable, location='lower left')
    >>> colorbar.set_ticks([0.0, 0.5, 1.0])
    >>> plt.gca().add_artist(colorbar)
    >>> plt.show()
@@ -52,7 +52,7 @@ matplotlibrc parameters
 -----------------------
 
 Here are parameters that can either be customized in the constructor of the
-**ColorBar** class or in the matplotlibrc file.
+**Colorbar** class or in the matplotlibrc file.
 
   * ``mappable``: scalar mappable object which implements the methods
     *get_cmap* and *get_array*

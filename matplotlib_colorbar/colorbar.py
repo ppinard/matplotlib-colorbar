@@ -33,6 +33,7 @@ parameters.
 # Standard library modules.
 import sys
 import imp
+import warnings
 
 # Third party modules.
 from matplotlib.rcsetup import \
@@ -161,7 +162,7 @@ class ColorbarCalculator(object):
         """
         return self._base._ticker()
 
-class ColorBar(Artist):
+class Colorbar(Artist):
 
     zorder = 5
 
@@ -584,3 +585,7 @@ class ColorBar(Artist):
         self._ticklocation = loc
 
     ticklocation = property(get_ticklocation, set_ticklocation)
+
+def ColorBar(*args, **kwargs):
+    warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
+    return Colorbar(*args, **kwargs)

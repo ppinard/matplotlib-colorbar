@@ -16,7 +16,7 @@ from nose.tools import \
      assert_false, assert_raises)
 
 # Local modules.
-from matplotlib_colorbar.colorbar import ColorBar
+from matplotlib_colorbar.colorbar import Colorbar
 
 
 # Globals and constants variables.
@@ -28,7 +28,7 @@ def create_figure():
     data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     mappable = ax.imshow(data)
 
-    colorbar = ColorBar(mappable)
+    colorbar = Colorbar(mappable)
     ax.add_artist(colorbar)
 
     return fig, ax, colorbar
