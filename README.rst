@@ -44,6 +44,7 @@ Here is an example how to add a scale bar::
    >>> data = np.array(plt.imread(cbook.get_sample_data('grace_hopper.png')))
    >>> mappable = plt.imshow(data[...,0], cmap='viridis')
    >>> colorbar = ColorBar(mappable, location='lower left')
+   >>> colorbar.set_ticks([0.0, 0.5, 1.0])
    >>> plt.gca().add_artist(colorbar)
    >>> plt.show()
 
@@ -60,7 +61,6 @@ Here are parameters that can either be customized in the constructor of the
     (default: ``None``, no label is shown)
   * ``orientation``: orientation, ``vertical`` or ``horizontal``
     (default: ``vertical``)
-  * ``nbins``: number of color division in the color bar (default: or 50)
   * ``length_fraction``: length of the color bar as a fraction of the
     axes's width (horizontal) or height (vertical) depending on the
     orientation (default: ``0.2``)
@@ -79,6 +79,7 @@ Here are parameters that can either be customized in the constructor of the
     optional sets the font properties for the label text
   * ``ticks``: ticks location (default: minimal and maximal values)
   * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
+  * ``ticklocation``: location of the ticks (default: ``auto``)
 
 License
 -------
