@@ -101,24 +101,6 @@ def test_colorbar_orientation_horizontal():
 
 
 @cleanup
-def test_colorbar_nbins():
-    _fig, _ax, colorbar = create_figure()
-
-    assert_is_none(colorbar.get_nbins())
-    assert_is_none(colorbar.nbins)
-
-    colorbar.set_nbins(25)
-    assert_equal(25, colorbar.get_nbins())
-    assert_equal(25, colorbar.nbins)
-
-    colorbar.nbins = 25
-    assert_equal(25, colorbar.get_nbins())
-    assert_equal(25, colorbar.nbins)
-
-    assert_raises(ValueError, colorbar.set_nbins, 0)
-
-
-@cleanup
 def test_colorbar_length_fraction():
     _fig, _ax, colorbar = create_figure()
 
