@@ -34,7 +34,7 @@ For development installation from the git repository::
 Example
 -------
 
-Here is an example how to add a scale bar::
+Here is an example how to add a color bar::
 
    >>> import numpy as np
    >>> import matplotlib.pyplot as plt
