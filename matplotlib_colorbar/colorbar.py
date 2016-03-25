@@ -83,6 +83,10 @@ defaultParams.update(
 imp.reload(sys.modules['matplotlib'])
 
 class ColorbarBase2(ColorbarBase):
+    """
+    Disable some methods from the original :class:`ColorbarBase` class of
+    matplotlib that required an :class:`Axes` object.
+    """
 
     def _set_label(self):
         pass
@@ -100,6 +104,10 @@ class ColorbarBase2(ColorbarBase):
         pass
 
 class ColorbarCalculator(object):
+    """
+    Internally computes the values to draw a colorbar without actually drawing
+    it as in the original :class:`ColorbarBase` class from matplotlib.
+    """
 
     def __init__(self, mappable, **kw):
         # Ensure the given mappable's norm has appropriate vmin and vmax set
@@ -137,6 +145,9 @@ class ColorbarCalculator(object):
             self._base.set_ticklabels(ticklabels, update_ticks=False)
 
     def calculate_colorbar(self):
+        """
+        Returns the positions and colors of all intervals inside the colorbar.
+        """
         self._base._process_values()
         self._base._find_range()
         X, Y = self._base._mesh()
@@ -144,6 +155,10 @@ class ColorbarCalculator(object):
         return X, Y, C
 
     def calculate_ticks(self):
+        """
+        Returns the sequence of ticks (colorbar data locations),
+        ticklabels (strings), and the corresponding offset string.
+        """
         return self._base._ticker()
 
 class ColorBar(Artist):
