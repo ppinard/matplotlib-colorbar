@@ -437,6 +437,7 @@ class Colorbar(Artist):
         if orientation is not None and \
                 orientation not in ['vertical', 'horizontal']:
             raise ValueError('Unknown orientation: %s' % orientation)
+        self._check_ticklocation(orientation=orientation)
         self._orientation = orientation
 
     orientation = property(get_orientation, set_orientation)
@@ -565,15 +566,14 @@ class Colorbar(Artist):
 
     ticklabels = property(get_ticklabels, set_ticklabels)
 
-    def get_ticklocation(self):
-        return self._ticklocation
-
-    def set_ticklocation(self, loc):
-        orientation = self.get_orientation()
+    def _check_ticklocation(self, loc=None, orientation=None):
+        if loc is None:
+            loc = getattr(self, 'ticklocation', None) # late definition
+        if orientation is None:
+            orientation = getattr(self, 'orientation', None) # late definition
 
         if loc is None or loc == 'auto':
-            loc = 'bottom' if orientation == 'horizontal' else 'right'
-
+            return
         if orientation == 'vertical' and loc not in ['left', 'right']:
             raise ValueError('Location must be either "left" or "right"'
                              'for vertical orientation')
@@ -581,10 +581,15 @@ class Colorbar(Artist):
             raise ValueError('Location must be either "top" or "bottom"'
                              'for horizontal orientation')
 
+    def get_ticklocation(self):
+        return self._ticklocation
+
+    def set_ticklocation(self, loc):
+        self._check_ticklocation(loc=loc)
         self._ticklocation = loc
 
     ticklocation = property(get_ticklocation, set_ticklocation)
 
-def ColorBar(*args, **kwargs):
+def ColorBar(*args, **kwargs): # pragma: no cover
     warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
     return Colorbar(*args, **kwargs)

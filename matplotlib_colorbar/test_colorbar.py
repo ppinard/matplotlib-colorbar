@@ -41,6 +41,38 @@ def test_colorbar_draw():
 
 
 @cleanup
+def test_colorbar_draw_ticklocation_bottom():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('bottom')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_top():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('top')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_left():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('left')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_right():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('right')
+    plt.draw()
+
+
+@cleanup
 def test_colorbar_label():
     _fig, _ax, colorbar = create_figure()
 
@@ -279,6 +311,45 @@ def test_colorbar_ticklabels():
     colorbar.ticks = [0., 1.]
     assert_raises(ValueError, colorbar.set_ticklabels, ['one label', ])
 
+
+@cleanup
+def test_colorbar_ticklocation():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_ticklocation())
+    assert_is_none(colorbar.ticklocation)
+
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('bottom')
+    assert_equal('bottom', colorbar.get_ticklocation())
+    assert_equal('bottom', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('top')
+    assert_equal('top', colorbar.get_ticklocation())
+    assert_equal('top', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('left')
+    assert_equal('left', colorbar.get_ticklocation())
+    assert_equal('left', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('right')
+    assert_equal('right', colorbar.get_ticklocation())
+    assert_equal('right', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('horizontal')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'left')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'right')
+
+    colorbar.set_orientation('vertical')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'bottom')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'top')
 
 @cleanup
 def test_colorbar_set_visible():
