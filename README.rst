@@ -52,7 +52,7 @@ matplotlibrc parameters
 -----------------------
 
 Here are parameters that can either be customized in the constructor of the
-**Colorbar** class or in the matplotlibrc file.
+**Colorbar** class or from the class properties:
 
   * ``mappable``: scalar mappable object which implements the methods
     *get_cmap* and *get_array*
@@ -80,6 +80,21 @@ Here are parameters that can either be customized in the constructor of the
   * ``ticks``: ticks location (default: minimal and maximal values)
   * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
   * ``ticklocation``: location of the ticks (default: ``auto``)
+
+Some of these parameters can be set in the matplotlibrc file:
+
+  * ``colorbar.orientation``
+  * ``colorbar.length_fraction``
+  * ``colorbar.width_fraction``
+  * ``colorbar.location``
+  * ``colorbar.pad``
+  * ``colorbar.border_pad``
+  * ``colorbar.sep``
+  * ``colorbar.frameon``
+  * ``colorbar.color``
+  * ``colorbar.box_color``
+  * ``colorbar.box_alpha``
+  * ``colorbar.ticklocation``
 
 License
 -------

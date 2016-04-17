@@ -23,8 +23,7 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.color
     - colorbar.box_color
     - colorbar.box_alpha
-    - colorbar.ticks
-    - colorbar.ticklabels
+    - colorbar.ticklocation
 
 See the class documentation (:class:`.ColorBar`) for a description of the
 parameters.
