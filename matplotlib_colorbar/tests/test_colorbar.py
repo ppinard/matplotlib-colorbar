@@ -7,7 +7,8 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from matplotlib.testing.decorators import cleanup
+import matplotlib.cbook as cbook
+from matplotlib.testing.decorators import cleanup, image_comparison
 
 import numpy as np
 
@@ -363,6 +364,20 @@ def test_colorbar_no_mappable():
     _fig, _ax, colorbar = create_figure()
     colorbar.set_mappable(False)
     plt.draw()
+
+
+@image_comparison(baseline_images=['example1'], extensions=['png'])
+def test_colorbar_example1():
+    with cbook.get_sample_data('grace_hopper.png') as fp:
+        data = np.array(plt.imread(fp))
+
+    fig = plt.figure()
+    ax = fig.add_subplot("111", aspect='equal')
+    mappable = ax.imshow(data[..., 0], cmap='viridis')
+    colorbar = Colorbar(mappable, location='lower left')
+    colorbar.set_ticks([0.0, 0.5, 1.0])
+    ax.add_artist(colorbar)
+
 
 if __name__ == '__main__':
     import nose
