@@ -22,7 +22,6 @@ after_success:
 notifications:
   email: false
 deploy:
-  matrix:
   - provider: pypi
     user: philippe.pinard
     password: 
