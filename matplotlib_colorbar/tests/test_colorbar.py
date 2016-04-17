@@ -7,7 +7,8 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from matplotlib.testing.decorators import cleanup
+import matplotlib.cbook as cbook
+from matplotlib.testing.decorators import cleanup, image_comparison
 
 import numpy as np
 
@@ -16,7 +17,7 @@ from nose.tools import \
      assert_false, assert_raises)
 
 # Local modules.
-from matplotlib_colorbar.colorbar import ColorBar
+from matplotlib_colorbar.colorbar import Colorbar
 
 
 # Globals and constants variables.
@@ -28,7 +29,7 @@ def create_figure():
     data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     mappable = ax.imshow(data)
 
-    colorbar = ColorBar(mappable)
+    colorbar = Colorbar(mappable)
     ax.add_artist(colorbar)
 
     return fig, ax, colorbar
@@ -37,6 +38,38 @@ def create_figure():
 @cleanup
 def test_colorbar_draw():
     create_figure()
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_bottom():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('bottom')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_top():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('top')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_left():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('left')
+    plt.draw()
+
+
+@cleanup
+def test_colorbar_draw_ticklocation_right():
+    _fig, _ax, colorbar = create_figure()
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('right')
     plt.draw()
 
 
@@ -98,24 +131,6 @@ def test_colorbar_orientation_horizontal():
     assert_equal('horizontal', colorbar.orientation)
 
     plt.draw()
-
-
-@cleanup
-def test_colorbar_nbins():
-    _fig, _ax, colorbar = create_figure()
-
-    assert_is_none(colorbar.get_nbins())
-    assert_is_none(colorbar.nbins)
-
-    colorbar.set_nbins(25)
-    assert_equal(25, colorbar.get_nbins())
-    assert_equal(25, colorbar.nbins)
-
-    colorbar.nbins = 25
-    assert_equal(25, colorbar.get_nbins())
-    assert_equal(25, colorbar.nbins)
-
-    assert_raises(ValueError, colorbar.set_nbins, 0)
 
 
 @cleanup
@@ -299,6 +314,45 @@ def test_colorbar_ticklabels():
 
 
 @cleanup
+def test_colorbar_ticklocation():
+    _fig, _ax, colorbar = create_figure()
+
+    assert_is_none(colorbar.get_ticklocation())
+    assert_is_none(colorbar.ticklocation)
+
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('bottom')
+    assert_equal('bottom', colorbar.get_ticklocation())
+    assert_equal('bottom', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('horizontal')
+    colorbar.set_ticklocation('top')
+    assert_equal('top', colorbar.get_ticklocation())
+    assert_equal('top', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('left')
+    assert_equal('left', colorbar.get_ticklocation())
+    assert_equal('left', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('vertical')
+    colorbar.set_ticklocation('right')
+    assert_equal('right', colorbar.get_ticklocation())
+    assert_equal('right', colorbar.ticklocation)
+    colorbar.set_ticklocation(None)
+
+    colorbar.set_orientation('horizontal')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'left')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'right')
+
+    colorbar.set_orientation('vertical')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'bottom')
+    assert_raises(ValueError, colorbar.set_ticklocation, 'top')
+
+@cleanup
 def test_colorbar_set_visible():
     _fig, _ax, colorbar = create_figure()
     colorbar.set_visible(False)
@@ -310,6 +364,20 @@ def test_colorbar_no_mappable():
     _fig, _ax, colorbar = create_figure()
     colorbar.set_mappable(False)
     plt.draw()
+
+
+@image_comparison(baseline_images=['example1'], extensions=['png'])
+def test_colorbar_example1():
+    with cbook.get_sample_data('grace_hopper.png') as fp:
+        data = np.array(plt.imread(fp))
+
+    fig = plt.figure()
+    ax = fig.add_subplot("111", aspect='equal')
+    mappable = ax.imshow(data[..., 0], cmap='viridis')
+    colorbar = Colorbar(mappable, location='lower left')
+    colorbar.set_ticks([0.0, 0.5, 1.0])
+    ax.add_artist(colorbar)
+
 
 if __name__ == '__main__':
     import nose

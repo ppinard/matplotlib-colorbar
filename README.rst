@@ -16,7 +16,7 @@ The position of the colorbar artist can be decided as for the legend.
 
 .. image:: https://raw.githubusercontent.com/ppinard/matplotlib-colorbar/master/doc/example1.png
 
-The artist supports customization either directly from the *ColorBar* object or
+The artist supports customization either directly from the *Colorbar* object or
 from the matplotlibrc.
 
 Installation
@@ -34,16 +34,17 @@ For development installation from the git repository::
 Example
 -------
 
-Here is an example how to add a scale bar::
+Here is an example how to add a color bar::
 
    >>> import numpy as np
    >>> import matplotlib.pyplot as plt
    >>> import matplotlib.cbook as cbook
-   >>> from matplotlib_colorbar.colorbar import ColorBar
+   >>> from matplotlib_colorbar.colorbar import Colorbar
    >>> plt.figure()
    >>> data = np.array(plt.imread(cbook.get_sample_data('grace_hopper.png')))
    >>> mappable = plt.imshow(data[...,0], cmap='viridis')
-   >>> colorbar = ColorBar(mappable, location='lower left')
+   >>> colorbar = Colorbar(mappable, location='lower left')
+   >>> colorbar.set_ticks([0.0, 0.5, 1.0])
    >>> plt.gca().add_artist(colorbar)
    >>> plt.show()
 
@@ -51,7 +52,7 @@ matplotlibrc parameters
 -----------------------
 
 Here are parameters that can either be customized in the constructor of the
-**ColorBar** class or in the matplotlibrc file.
+**Colorbar** class or from the class properties:
 
   * ``mappable``: scalar mappable object which implements the methods
     *get_cmap* and *get_array*
@@ -60,7 +61,6 @@ Here are parameters that can either be customized in the constructor of the
     (default: ``None``, no label is shown)
   * ``orientation``: orientation, ``vertical`` or ``horizontal``
     (default: ``vertical``)
-  * ``nbins``: number of color division in the color bar (default: or 50)
   * ``length_fraction``: length of the color bar as a fraction of the
     axes's width (horizontal) or height (vertical) depending on the
     orientation (default: ``0.2``)
@@ -79,6 +79,22 @@ Here are parameters that can either be customized in the constructor of the
     optional sets the font properties for the label text
   * ``ticks``: ticks location (default: minimal and maximal values)
   * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
+  * ``ticklocation``: location of the ticks (default: ``auto``)
+
+Some of these parameters can be set in the matplotlibrc file:
+
+  * ``colorbar.orientation``
+  * ``colorbar.length_fraction``
+  * ``colorbar.width_fraction``
+  * ``colorbar.location``
+  * ``colorbar.pad``
+  * ``colorbar.border_pad``
+  * ``colorbar.sep``
+  * ``colorbar.frameon``
+  * ``colorbar.color``
+  * ``colorbar.box_color``
+  * ``colorbar.box_alpha``
+  * ``colorbar.ticklocation``
 
 License
 -------
