@@ -255,10 +255,6 @@ class Colorbar(Artist):
         # Get parameters
         from matplotlib import rcParams  # late import
 
-        mappable = self.mappable
-        cmap = self.mappable.cmap
-        label = self.label
-
         def _get_value(attr, default):
             value = getattr(self, attr)
             if value is None:
@@ -278,11 +274,15 @@ class Colorbar(Artist):
         box_color = _get_value('box_color', 'w')
         box_alpha = _get_value('box_alpha', 1.0)
         font_properties = self.font_properties
-        ticks = self.ticks
-        ticklabels = self.ticklabels
         ticklocation = _get_value('ticklocation', 'auto')
         if ticklocation == 'auto':
             ticklocation = 'bottom' if orientation == 'horizontal' else 'right'
+
+        mappable = self.mappable
+        cmap = self.mappable.cmap
+        label = self.label
+        ticks = self.ticks
+        ticklabels = self.ticklabels
 
         ax = self.axes
 
