@@ -78,7 +78,7 @@ defaultParams.update(
      'colorbar.color': ['k', validate_color],
      'colorbar.box_color': ['w', validate_color],
      'colorbar.box_alpha': [1.0, validate_float],
-     'colorbar.nmaxbins': [2, validate_int],
+     'colorbar.nmaxbins': [3, validate_int],
      })
 
 # Reload matplotlib to reset the default parameters
