@@ -80,6 +80,8 @@ Here are parameters that can either be customized in the constructor of the
   * ``ticks``: ticks location (default: minimal and maximal values)
   * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
   * ``ticklocation``: location of the ticks (default: ``auto``)
+  * ``nmaxbins``: maximum number of intervals used in the :class:`MaxNLocator` 
+    ticker object, if neither *ticks* or *ticklabels* are defined. (default: ``3``)
 
 Some of these parameters can be set in the matplotlibrc file:
 
@@ -95,6 +97,7 @@ Some of these parameters can be set in the matplotlibrc file:
   * ``colorbar.box_color``
   * ``colorbar.box_alpha``
   * ``colorbar.ticklocation``
+  * ``colorbar.nmaxbins``
 
 License
 -------

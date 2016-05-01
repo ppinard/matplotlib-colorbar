@@ -24,6 +24,7 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.box_color
     - colorbar.box_alpha
     - colorbar.ticklocation
+    - colorbar.nmaxbins
 
 See the class documentation (:class:`.ColorBar`) for a description of the
 parameters.
@@ -37,7 +38,7 @@ import warnings
 # Third party modules.
 from matplotlib.rcsetup import \
     (defaultParams, ValidateInStrings, validate_float,
-     validate_legend_loc, validate_bool, validate_color)
+     validate_legend_loc, validate_bool, validate_color, validate_int)
 from matplotlib.artist import Artist
 from matplotlib.cbook import is_string_like
 from matplotlib.offsetbox import \
@@ -77,6 +78,7 @@ defaultParams.update(
      'colorbar.color': ['k', validate_color],
      'colorbar.box_color': ['w', validate_color],
      'colorbar.box_alpha': [1.0, validate_float],
+     'colorbar.nmaxbins': [2, validate_int],
      })
 
 # Reload matplotlib to reset the default parameters
@@ -181,7 +183,7 @@ class Colorbar(Artist):
                  location=None, pad=None, border_pad=None, sep=None,
                  frameon=None, color=None, box_color=None, box_alpha=None,
                  font_properties=None, ticks=None, ticklabels=None,
-                 ticklocation=None):
+                 ticklocation=None, nmaxbins=None):
         """
         Creates a new color bar.
 
@@ -224,6 +226,10 @@ class Colorbar(Artist):
             oriented colorbar, or ``auto`` for automatic adjustment (``right``
             for vertical and ``bottom`` for horizontal oriented colorbar).
             (default: rcParams['colorbar.ticklocation'] or ``auto``)
+        :arg nmaxbins: maximum number of intervals used in the 
+            :class:`MaxNLocator` ticker object, if neither *ticks*
+            or *ticklabels* are defined. (default: rcParams['colorbar.nmaxbins'] 
+            or ``3``)
         """
         Artist.__init__(self)
 
@@ -244,6 +250,7 @@ class Colorbar(Artist):
         self.ticks = ticks
         self.ticklabels = ticklabels
         self.ticklocation = ticklocation
+        self.nmaxbins = nmaxbins
 
     def draw(self, renderer, *args, **kwargs):
         if not self.get_visible():
@@ -276,12 +283,16 @@ class Colorbar(Artist):
         ticklocation = _get_value('ticklocation', 'auto')
         if ticklocation == 'auto':
             ticklocation = 'bottom' if orientation == 'horizontal' else 'right'
+        nmaxbins = _get_value('nmaxbins', 3)
 
         mappable = self.mappable
         cmap = self.mappable.cmap
         label = self.label
         ticks = self.ticks
         ticklabels = self.ticklabels
+
+        if ticks is None and ticklabels is None:
+            ticks = ticker.MaxNLocator(nmaxbins)
 
         ax = self.axes
 
@@ -589,6 +600,16 @@ class Colorbar(Artist):
         self._ticklocation = loc
 
     ticklocation = property(get_ticklocation, set_ticklocation)
+
+    def get_nmaxbins(self):
+        return self._nmaxbins
+
+    def set_nmaxbins(self, nmaxbins):
+        if nmaxbins is not None:
+            nmaxbins = int(nmaxbins)
+        self._nmaxbins = nmaxbins
+
+    nmaxbins = property(get_nmaxbins, set_nmaxbins)
 
 def ColorBar(*args, **kwargs): # pragma: no cover
     warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
