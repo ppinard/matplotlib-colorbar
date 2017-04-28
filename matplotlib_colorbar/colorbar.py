@@ -82,6 +82,7 @@ defaultParams.update(
 # Reload matplotlib to reset the default parameters
 imp.reload(sys.modules['matplotlib'])
 
+
 class ColorbarBase2(ColorbarBase):
     """
     Disable some methods from the original :class:`ColorbarBase` class of
@@ -102,6 +103,7 @@ class ColorbarBase2(ColorbarBase):
 
     def draw_all(self):
         pass
+
 
 class ColorbarCalculator(object):
     """
@@ -160,6 +162,7 @@ class ColorbarCalculator(object):
         ticklabels (strings), and the corresponding offset string.
         """
         return self._base._ticker()
+
 
 class Colorbar(Artist):
 
@@ -278,7 +281,8 @@ class Colorbar(Artist):
             ticklocation = 'bottom' if orientation == 'horizontal' else 'right'
 
         mappable = self.mappable
-        cmap = self.mappable.cmap
+        cmap = self.mappable.get_cmap()
+        norm = self.mappable.norm
         label = self.label
         ticks = self.ticks
         ticklabels = self.ticklabels
@@ -286,7 +290,8 @@ class Colorbar(Artist):
         ax = self.axes
 
         # Calculate
-        calculator = ColorbarCalculator(mappable, ticks=ticks, ticklabels=ticklabels)
+        calculator = ColorbarCalculator(
+            mappable, ticks=ticks, ticklabels=ticklabels)
 
         X, Y, C = calculator.calculate_colorbar()
         X *= width_fraction
@@ -304,14 +309,16 @@ class Colorbar(Artist):
         colorbarbox = AuxTransformBox(ax.transAxes)
 
         patches = []
-        for x0, y0, width, height in zip(X[:-1, 0], Y[:-1, 0], widths, heights):
+        for x0, y0, width, height in zip(X[:-1, 0], Y[:-1, 0],
+                                         widths, heights):
             patch = Rectangle((x0, y0), width, height)
             patches.append(patch)
 
-        edgecolors = 'none' #if self.drawedges else 'none'
-        #FIXME: drawedge property
-        #FIXME: Filled property
-        col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors)
+        edgecolors = 'none'  # if self.drawedges else 'none'
+        # FIXME: drawedge property
+        # FIXME: Filled property
+        col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors,
+                              norm=norm)
         col.set_array(C[:, 0])
         colorbarbox.add_artist(col)
 
@@ -401,7 +408,7 @@ class Colorbar(Artist):
         elif ticklocation == 'right':
             children = [colorbarbox, labelbox] if labelbox else [colorbarbox]
             child = HPacker(children=children, align='center', pad=0, sep=sep)
-#
+
         box = AnchoredOffsetbox(loc=location,
                                 pad=pad,
                                 borderpad=border_pad,
@@ -568,9 +575,9 @@ class Colorbar(Artist):
 
     def _check_ticklocation(self, loc=None, orientation=None):
         if loc is None:
-            loc = getattr(self, 'ticklocation', None) # late definition
+            loc = getattr(self, 'ticklocation', None)  # late definition
         if orientation is None:
-            orientation = getattr(self, 'orientation', None) # late definition
+            orientation = getattr(self, 'orientation', None)  # late definition
 
         if loc is None or loc == 'auto':
             return
@@ -590,6 +597,8 @@ class Colorbar(Artist):
 
     ticklocation = property(get_ticklocation, set_ticklocation)
 
-def ColorBar(*args, **kwargs): # pragma: no cover
-    warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
+
+def ColorBar(*args, **kwargs):  # pragma: no cover
+    warnings.warn("Class is deprecated. Use Colorbar(...) instead",
+                  DeprecationWarning)
     return Colorbar(*args, **kwargs)
