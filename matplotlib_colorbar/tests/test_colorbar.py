@@ -371,11 +371,25 @@ def test_colorbar_example1():
     with cbook.get_sample_data('grace_hopper.png') as fp:
         data = np.array(plt.imread(fp))
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot("111", aspect='equal')
     mappable = ax.imshow(data[..., 0], cmap='viridis')
     colorbar = Colorbar(mappable, location='lower left')
     colorbar.set_ticks([0.0, 0.5, 1.0])
+    ax.add_artist(colorbar)
+
+
+@image_comparison(baseline_images=['example2'], extensions=['png'])
+def test_colorbar_example2():
+    with cbook.get_sample_data('grace_hopper.png') as fp:
+        data = np.array(plt.imread(fp))
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot("111", aspect='equal')
+    norm = matplotlib.colors.Normalize(vmin=-1.0, vmax=1.0)
+    mappable = ax.imshow(data[..., 0], cmap='viridis', norm=norm)
+    colorbar = Colorbar(mappable, location='lower left')
+    colorbar.set_ticks([-1.0, 0, 1.0])
     ax.add_artist(colorbar)
 
 
