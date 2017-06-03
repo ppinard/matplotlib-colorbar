@@ -26,7 +26,7 @@ setup(name='matplotlib-colorbar',
       maintainer='Philippe Pinard',
       maintainer_email='philippe.pinard@gmail.com',
 
-      url='http://pyhmsa.readthedocs.org',
+      url='https://github.com/ppinard/matplotlib-colorbar',
       license='BSD',
       keywords='matplotlib color bar image',
 
