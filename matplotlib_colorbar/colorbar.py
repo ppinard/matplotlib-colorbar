@@ -278,7 +278,8 @@ class Colorbar(Artist):
             ticklocation = 'bottom' if orientation == 'horizontal' else 'right'
 
         mappable = self.mappable
-        cmap = self.mappable.cmap
+        cmap = self.mappable.get_cmap()
+        norm = self.mappable.norm
         label = self.label
         ticks = self.ticks
         ticklabels = self.ticklabels
@@ -311,7 +312,7 @@ class Colorbar(Artist):
         edgecolors = 'none' #if self.drawedges else 'none'
         #FIXME: drawedge property
         #FIXME: Filled property
-        col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors)
+        col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors, norm=norm)
         col.set_array(C[:, 0])
         colorbarbox.add_artist(col)
 
@@ -593,3 +594,4 @@ class Colorbar(Artist):
 def ColorBar(*args, **kwargs): # pragma: no cover
     warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
     return Colorbar(*args, **kwargs)
+
