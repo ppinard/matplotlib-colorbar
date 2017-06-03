@@ -9,6 +9,9 @@ matplotlib-colorbar
 
 .. image:: https://codecov.io/github/ppinard/matplotlib-colorbar/coverage.svg?branch=master
    :target: https://codecov.io/github/ppinard/matplotlib-colorbar?branch=master
+   
+.. image:: https://www.versioneye.com/user/projects/593302dc22f278003c5f8550/badge.svg?style=flat-square
+   :target: https://www.versioneye.com/user/projects/593302dc22f278003c5f8550
 
 Provides a new artist for matplotlib to display a colorbar,
 instead of an axis as it is the default in matplotlib.
