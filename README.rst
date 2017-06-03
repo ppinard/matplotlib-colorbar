@@ -106,7 +106,7 @@ Here are parameters that can be customized in the matplotlibrc file.
 Contributors
 ------------
 
-`@cphyc <https://github.com/cphyc>`_ and `@jnth <https://github.com/jnth>`
+`@cphyc <https://github.com/cphyc>`_ and `@jnth <https://github.com/jnth>`_
 
 License
 -------
