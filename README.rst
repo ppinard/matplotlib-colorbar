@@ -48,11 +48,10 @@ Here is an example how to add a color bar::
    >>> plt.gca().add_artist(colorbar)
    >>> plt.show()
 
-matplotlibrc parameters
------------------------
+Colorbar arguments
+------------------
 
-Here are parameters that can either be customized in the constructor of the
-**Colorbar** class or from the class properties:
+Here are parameters of the **Colorbar** class constructor.
 
   * ``mappable``: scalar mappable object which implements the methods
     *get_cmap* and *get_array*
@@ -81,24 +80,37 @@ Here are parameters that can either be customized in the constructor of the
   * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
   * ``ticklocation``: location of the ticks (default: ``auto``)
 
-Some of these parameters can be set in the matplotlibrc file:
+matplotlibrc parameters
+-----------------------
 
-  * ``colorbar.orientation``
-  * ``colorbar.length_fraction``
-  * ``colorbar.width_fraction``
-  * ``colorbar.location``
-  * ``colorbar.pad``
-  * ``colorbar.border_pad``
-  * ``colorbar.sep``
-  * ``colorbar.frameon``
-  * ``colorbar.color``
-  * ``colorbar.box_color``
-  * ``colorbar.box_alpha``
-  * ``colorbar.ticklocation``
+Here are parameters that can be customized in the matplotlibrc file.
+
+  * ``orientation``: orientation, ``vertical`` or ``horizontal``
+    (default: ``vertical``)
+  * ``length_fraction``: length of the color bar as a fraction of the
+    axes's width (horizontal) or height (vertical) depending on the
+    orientation (default: ``0.2``)
+  * ``width_fraction``: width of the color bar as a fraction of the
+    axes's height (horizontal) or width (vertical) depending on the
+    orientation (default: ``0.02``)
+  * ``location``: a location code (same as legend) (default: ``upper right``)
+  * ``pad``: fraction of the font size (default: ``0.2``)
+  * ``border_pad``: fraction of the font size (default: ``0.1``)
+  * ``sep``: separation between color bar and label in points (default: ``5``)
+  * ``frameon``: if True, will draw a box around the color bar (default: ``True``)
+  * ``color``: color for the tick text and label (default: ``k``)
+  * ``box_color``: color of the box (if *frameon*) (default: ``w``)
+  * ``box_alpha``: transparency of box (default: ``1.0``)
+  * ``ticklocation``: location of the ticks (default: ``auto``)
+
+Contributors
+------------
+
+`@cphyc <https://github.com/cphyc>`_ and `@jnth <https://github.com/jnth>`
 
 License
 -------
 
 License under the BSD License, compatible with matplotlib.
 
-Copyright (c) 2015-2016 Philippe Pinard and collaborators
+Copyright (c) 2015-2017 Philippe Pinard
