@@ -214,8 +214,13 @@ class Colorbar(Artist):
             (default: rcParams['colorbar.box_color'] or ``w``)
         :arg box_alpha: transparency of box
             (default: rcParams['colorbar.box_alpha'] or ``1.0``)
-        :arg font_properties: a matplotlib.font_manager.FontProperties instance,
-            optional sets the font properties for the label text
+        
+        :arg font_properties: font properties of the label text, specified
+            either as dict or `fontconfig <http://www.fontconfig.org/>`_
+            pattern (XML).
+        :type font_properties: :class:`matplotlib.font_manager.FontProperties`,
+            :class:`str` or :class:`dict`
+        
         :arg ticks: ticks location
             (default: minimal and maximal values)
         :arg ticklabels: a list of tick labels (same length as ``ticks`` argument)
@@ -240,7 +245,18 @@ class Colorbar(Artist):
         self.color = color
         self.box_color = box_color
         self.box_alpha = box_alpha
-        self.font_properties = FontProperties(font_properties)
+
+        if font_properties is None:
+            font_properties = FontProperties()
+        elif isinstance(font_properties, dict):
+            font_properties = FontProperties(**font_properties)
+        elif is_string_like(font_properties):
+            font_properties = FontProperties(font_properties)
+        else:
+            raise TypeError("Unsupported type for `font_properties`. Pass "
+                            "either a dict or a font config pattern as string.")
+        self.font_properties = font_properties
+
         self.ticks = ticks
         self.ticklabels = ticklabels
         self.ticklocation = ticklocation
