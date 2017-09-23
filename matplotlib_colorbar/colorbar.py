@@ -30,11 +30,10 @@ parameters.
 """
 
 # Standard library modules.
-import sys
-import imp
 import warnings
 
 # Third party modules.
+import matplotlib
 from matplotlib.rcsetup import \
     (defaultParams, ValidateInStrings, validate_float,
      validate_legend_loc, validate_bool, validate_color)
@@ -51,6 +50,8 @@ import matplotlib.contour as contour
 import matplotlib.ticker as ticker
 
 import numpy as np
+
+import six
 
 # Local modules.
 
@@ -79,8 +80,11 @@ defaultParams.update(
      'colorbar.box_alpha': [1.0, validate_float],
      })
 
-# Reload matplotlib to reset the default parameters
-imp.reload(sys.modules['matplotlib'])
+# Recreate the validate function
+matplotlib.rcParams.validate = \
+    dict((key, converter) for key, (default, converter) in
+         six.iteritems(defaultParams)
+         if key not in matplotlib._all_deprecated)
 
 class ColorbarBase2(ColorbarBase):
     """
