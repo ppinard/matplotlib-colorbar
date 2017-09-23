@@ -10,9 +10,6 @@ matplotlib-colorbar
 .. image:: https://codecov.io/github/ppinard/matplotlib-colorbar/coverage.svg?branch=master
    :target: https://codecov.io/github/ppinard/matplotlib-colorbar?branch=master
    
-.. image:: https://www.versioneye.com/user/projects/593302dc22f278003c5f8550/badge.svg?style=flat-square
-   :target: https://www.versioneye.com/user/projects/593302dc22f278003c5f8550
-
 Provides a new artist for matplotlib to display a colorbar,
 instead of an axis as it is the default in matplotlib.
 The position of the colorbar artist can be decided as for the legend.
@@ -56,55 +53,41 @@ Colorbar arguments
 
 Here are parameters of the **Colorbar** class constructor.
 
-  * ``mappable``: scalar mappable object which implements the methods
-    *get_cmap* and *get_array*
-    (default: ``None``, the mappable can be specified later)
-  * ``label``: label on top of the color bar
-    (default: ``None``, no label is shown)
-  * ``orientation``: orientation, ``vertical`` or ``horizontal``
-    (default: ``vertical``)
-  * ``length_fraction``: length of the color bar as a fraction of the
-    axes's width (horizontal) or height (vertical) depending on the
-    orientation (default: ``0.2``)
-  * ``width_fraction``: width of the color bar as a fraction of the
-    axes's height (horizontal) or width (vertical) depending on the
-    orientation (default: ``0.02``)
-  * ``location``: a location code (same as legend) (default: ``upper right``)
-  * ``pad``: fraction of the font size (default: ``0.2``)
-  * ``border_pad``: fraction of the font size (default: ``0.1``)
-  * ``sep``: separation between color bar and label in points (default: ``5``)
-  * ``frameon``: if True, will draw a box around the color bar (default: ``True``)
-  * ``color``: color for the tick text and label (default: ``k``)
-  * ``box_color``: color of the box (if *frameon*) (default: ``w``)
-  * ``box_alpha``: transparency of box (default: ``1.0``)
-  * ``font_properties``: a matplotlib.font_manager.FontProperties instance,
-    optional sets the font properties for the label text
-  * ``ticks``: ticks location (default: minimal and maximal values)
-  * ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
-  * ``ticklocation``: location of the ticks (default: ``auto``)
+* ``mappable``: scalar mappable object which implements the methods *get_cmap* and *get_array* (default: ``None``, the mappable can be specified later)
+* ``label``: label on top of the color bar (default: ``None``, no label is shown)
+* ``orientation``: orientation, ``vertical`` or ``horizontal`` (default: ``vertical``)
+* ``length_fraction``: length of the color bar as a fraction of the axes's width (horizontal) or height (vertical) depending on the orientation (default: ``0.2``)
+* ``width_fraction``: width of the color bar as a fraction of the axes's height (horizontal) or width (vertical) depending on the orientation (default: ``0.02``)
+* ``location``: a location code (same as legend) (default: ``upper right``)
+* ``pad``: fraction of the font size (default: ``0.2``)
+* ``border_pad``: fraction of the font size (default: ``0.1``)
+* ``sep``: separation between color bar and label in points (default: ``5``)
+* ``frameon``: if True, will draw a box around the color bar (default: ``True``)
+* ``color``: color for the tick text and label (default: ``k``)
+* ``box_color``: color of the box (if *frameon*) (default: ``w``)
+* ``box_alpha``: transparency of box (default: ``1.0``)
+* ``font_properties``: font properties of the label text, specified either as dict or `fontconfig <http://www.fontconfig.org/>`_ pattern (XML).
+* ``ticks``: ticks location (default: minimal and maximal values)
+* ``ticklabels``: a list of tick labels (same length as ``ticks`` argument)
+* ``ticklocation``: location of the ticks: ``left`` or ``right`` for vertical oriented colorbar, ``bottom`` or ``top for horizontal oriented colorbar, or ``auto`` for automatic adjustment (``right`` for vertical and ``bottom`` for horizontal oriented colorbar). (default: ``auto``)
 
 matplotlibrc parameters
 -----------------------
 
 Here are parameters that can be customized in the matplotlibrc file.
 
-  * ``orientation``: orientation, ``vertical`` or ``horizontal``
-    (default: ``vertical``)
-  * ``length_fraction``: length of the color bar as a fraction of the
-    axes's width (horizontal) or height (vertical) depending on the
-    orientation (default: ``0.2``)
-  * ``width_fraction``: width of the color bar as a fraction of the
-    axes's height (horizontal) or width (vertical) depending on the
-    orientation (default: ``0.02``)
-  * ``location``: a location code (same as legend) (default: ``upper right``)
-  * ``pad``: fraction of the font size (default: ``0.2``)
-  * ``border_pad``: fraction of the font size (default: ``0.1``)
-  * ``sep``: separation between color bar and label in points (default: ``5``)
-  * ``frameon``: if True, will draw a box around the color bar (default: ``True``)
-  * ``color``: color for the tick text and label (default: ``k``)
-  * ``box_color``: color of the box (if *frameon*) (default: ``w``)
-  * ``box_alpha``: transparency of box (default: ``1.0``)
-  * ``ticklocation``: location of the ticks (default: ``auto``)
+* ``orientation``: orientation, ``vertical`` or ``horizontal`` (default: ``vertical``)
+* ``length_fraction``: length of the color bar as a fraction of the axes's width (horizontal) or height (vertical) depending on the orientation (default: ``0.2``)
+* ``width_fraction``: width of the color bar as a fraction of the axes's height (horizontal) or width (vertical) depending on the orientation (default: ``0.02``)
+* ``location``: a location code (same as legend) (default: ``upper right``)
+* ``pad``: fraction of the font size (default: ``0.2``)
+* ``border_pad``: fraction of the font size (default: ``0.1``)
+* ``sep``: separation between color bar and label in points (default: ``5``)
+* ``frameon``: if True, will draw a box around the color bar (default: ``True``)
+* ``color``: color for the tick text and label (default: ``k``)
+* ``box_color``: color of the box (if *frameon*) (default: ``w``)
+* ``box_alpha``: transparency of box (default: ``1.0``)
+* ``ticklocation``: location of the ticks (default: ``auto``)
 
 Contributors
 ------------
