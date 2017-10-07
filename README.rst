@@ -89,6 +89,13 @@ Here are parameters that can be customized in the matplotlibrc file.
 * ``box_alpha``: transparency of box (default: ``1.0``)
 * ``ticklocation``: location of the ticks (default: ``auto``)
 
+Release notes
+-------------
+0.3.5
+^^^^^
+
+* Fix: UserWarning This call to matplotlib.use() has no effect (`#9 <https://github.com/ppinard/matplotlib-colorbar/issues/9>`_)
+
 Contributors
 ------------
 
