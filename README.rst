@@ -91,6 +91,11 @@ Here are parameters that can be customized in the matplotlibrc file.
 
 Release notes
 -------------
+0.3.6
+^^^^^
+
+* Fix deprecated usage of is_string_like
+
 0.3.5
 ^^^^^
 
