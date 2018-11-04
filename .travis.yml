@@ -3,17 +3,11 @@ language: python
 cache:
   directories:
   - $HOME/.pip-cache/
-matrix:
-  include:
-  - python: '3.6'
-    env: DEPLOY=yes
-    os: linux
-  - python: '3.5'
-    env: DEPLOY=no
-    os: linux
-  - python: '2.7'
-    env: DEPLOY=no
-    os: linux
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+  - "3.7-dev"
 install:
 - pip install --cache-dir $HOME/.pip-cache --upgrade pip codecov
 - pip install --cache-dir $HOME/.pip-cache --upgrade -r requirements.txt
@@ -24,14 +18,3 @@ after_success:
 - codecov
 notifications:
   email: false
-deploy:
-  - provider: pypi
-    user: philippe.pinard
-    password: 
-    distributions: sdist bdist_wheel
-    on:
-      tags: true
-      repo: ppinard/matplotlib-colorbar
-      condition: $DEPLOY = yes
-    password:
-      secure: YHAdL7LiwTqAA3iuswegUW5kguCxBEmzKTfqvn9ZUSuAdmCL1uyQ7iH6iOA9UXbHRnxXEV8uTtlQo+gD03HenR4VmyLl8rVj4XVqhBSeOlBfDeccnUJrXsp80u4+GcUQI0U1EsgogJTE/FMuEuAfAipdOIuWutdrI0/PRHKd5VKX/hfwngJrPXfZapPI3yqIjqj0o5iDZJZSkSWM+CA0fIW1CbqAiXpIf8TZrOncTicfXg+CBl0G2/5pV2SIPiAAneTLl+HmmmxAlU8uKKOY83rBRilKl8+FPKUtVwJ3FqiAIG/SsL3/rDLY9g04/xhAGdbU4eBRC201fZ94XZYudIWjBmIcos6KF3oO6IzBMUEjzrx/R9j68tHINzDYCY3FSDFI9rQmHecnXTPr/XrmCmmKY7hg6ZlykJvbC1oilT2rTo7E0Fk6mLq676V+f5BEOrxlDZ4r57uTUN19ODNOUV54GY3QckfhgHHPXo7mPlX3nHM+U2llXPQenvMXuvtbWewa9CAZmDHUDu5/Xc6KXxn4PrOEWdYwKja9LrBeJRmEFZCInSuTPCPHq8yOzwC6o0OMdECzbJJoONUq85aEe1Y3J4rHGUwm7l69WP0eoKw30Knw8/3sX9LhC7lHumYYgKtHgWtYdOw3+tp2qZ6GkkOcq37w6UxQGTDTpH5K1yk=
