@@ -44,10 +44,10 @@ setup(name='matplotlib-colorbar',
       package_data={},
 
       install_requires=['matplotlib'],
+      setup_requires=['pytest-runner'],
+      tests_require=['pytest'],
 
       zip_safe=True,
-
-      test_suite='nose.collector',
 
       cmdclass=versioneer.get_cmdclass(),
 

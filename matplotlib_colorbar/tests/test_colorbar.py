@@ -4,17 +4,14 @@
 # Standard library modules.
 
 # Third party modules.
-import matplotlib
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
+import matplotlib.colors
 from matplotlib.testing.decorators import cleanup, image_comparison
 
 import numpy as np
 
-from nose.tools import \
-    (assert_equal, assert_almost_equal, assert_is_none, assert_true,
-     assert_false, assert_raises)
+import pytest
 
 # Local modules.
 from matplotlib_colorbar.colorbar import Colorbar
@@ -77,16 +74,16 @@ def test_colorbar_draw_ticklocation_right():
 def test_colorbar_label():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_label())
-    assert_is_none(colorbar.label)
+    assert colorbar.get_label() is None
+    assert colorbar.label is None
 
     colorbar.set_label('Hello world')
-    assert_equal('Hello world', colorbar.get_label())
-    assert_equal('Hello world', colorbar.label)
+    assert colorbar.get_label() == 'Hello world'
+    assert colorbar.label == 'Hello world'
 
     colorbar.label = 'Hello world'
-    assert_equal('Hello world', colorbar.get_label())
-    assert_equal('Hello world', colorbar.label)
+    assert colorbar.get_label() == 'Hello world'
+    assert colorbar.label == 'Hello world'
 
     plt.draw()
 
@@ -94,23 +91,25 @@ def test_colorbar_label():
 @cleanup
 def test_colorbar_orientation():
     _fig, _ax, colorbar = create_figure()
-    assert_raises(ValueError, colorbar.set_orientation, 'blah')
+
+    with pytest.raises(ValueError):
+        colorbar.set_orientation('blah')
 
 
 @cleanup
 def test_colorbar_orientation_vertical():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_orientation())
-    assert_is_none(colorbar.orientation)
+    assert colorbar.get_orientation() is None
+    assert colorbar.orientation is None
 
     colorbar.set_orientation('vertical')
-    assert_equal('vertical', colorbar.get_orientation())
-    assert_equal('vertical', colorbar.orientation)
+    assert colorbar.get_orientation() == 'vertical'
+    assert colorbar.orientation == 'vertical'
 
     colorbar.orientation = 'vertical'
-    assert_equal('vertical', colorbar.get_orientation())
-    assert_equal('vertical', colorbar.orientation)
+    assert colorbar.get_orientation() == 'vertical'
+    assert colorbar.orientation == 'vertical'
 
     plt.draw()
 
@@ -119,16 +118,16 @@ def test_colorbar_orientation_vertical():
 def test_colorbar_orientation_horizontal():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_orientation())
-    assert_is_none(colorbar.orientation)
+    assert colorbar.get_orientation() is None
+    assert colorbar.orientation is None
 
     colorbar.set_orientation('horizontal')
-    assert_equal('horizontal', colorbar.get_orientation())
-    assert_equal('horizontal', colorbar.orientation)
+    assert colorbar.get_orientation() == 'horizontal'
+    assert colorbar.orientation == 'horizontal'
 
     colorbar.orientation = 'horizontal'
-    assert_equal('horizontal', colorbar.get_orientation())
-    assert_equal('horizontal', colorbar.orientation)
+    assert colorbar.get_orientation() == 'horizontal'
+    assert colorbar.orientation == 'horizontal'
 
     plt.draw()
 
@@ -137,155 +136,162 @@ def test_colorbar_orientation_horizontal():
 def test_colorbar_length_fraction():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_length_fraction())
-    assert_is_none(colorbar.length_fraction)
+    assert colorbar.get_length_fraction() is None
+    assert colorbar.length_fraction is None
 
     colorbar.set_length_fraction(0.2)
-    assert_almost_equal(0.2, colorbar.get_length_fraction())
-    assert_almost_equal(0.2, colorbar.length_fraction)
+    assert colorbar.get_length_fraction() == pytest.approx(0.2, abs=1e-2)
+    assert colorbar.length_fraction == pytest.approx(0.2, abs=1e-2)
 
     colorbar.length_fraction = 0.1
-    assert_almost_equal(0.1, colorbar.get_length_fraction())
-    assert_almost_equal(0.1, colorbar.length_fraction)
+    assert colorbar.get_length_fraction() == pytest.approx(0.1, abs=1e-2)
+    assert colorbar.length_fraction == pytest.approx(0.1, abs=1e-2)
 
-    assert_raises(ValueError, colorbar.set_length_fraction, 0.0)
-    assert_raises(ValueError, colorbar.set_length_fraction, 1.1)
+    with pytest.raises(ValueError):
+        colorbar.set_length_fraction(0.0)
+    with pytest.raises(ValueError):
+        colorbar.set_length_fraction(1.1)
 
 
 @cleanup
 def test_colorbar_width_fraction():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_width_fraction())
-    assert_is_none(colorbar.width_fraction)
+    assert colorbar.get_width_fraction() is None
+    assert colorbar.width_fraction is None
 
     colorbar.set_width_fraction(0.2)
-    assert_almost_equal(0.2, colorbar.get_width_fraction())
-    assert_almost_equal(0.2, colorbar.width_fraction)
+    assert colorbar.get_width_fraction() == pytest.approx(0.2, abs=1e-2)
+    assert colorbar.width_fraction == pytest.approx(0.2, abs=1e-2)
 
     colorbar.width_fraction = 0.1
-    assert_almost_equal(0.1, colorbar.get_width_fraction())
-    assert_almost_equal(0.1, colorbar.width_fraction)
+    assert colorbar.get_width_fraction() == pytest.approx(0.1, abs=1e-2)
+    assert colorbar.width_fraction == pytest.approx(0.1, abs=1e-2)
 
-    assert_raises(ValueError, colorbar.set_width_fraction, 0.0)
-    assert_raises(ValueError, colorbar.set_width_fraction, 1.1)
+    with pytest.raises(ValueError):
+        colorbar.set_width_fraction(0.0)
+    with pytest.raises(ValueError):
+        colorbar.set_width_fraction(1.1)
 
 
 @cleanup
 def test_colorbar_location():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_location())
-    assert_is_none(colorbar.location)
+    assert colorbar.get_location() is None
+    assert colorbar.location is None
 
     colorbar.set_location('upper right')
-    assert_equal(1, colorbar.get_location())
-    assert_equal(1, colorbar.location)
+    assert colorbar.get_location() == 1
+    assert colorbar.location == 1
 
     colorbar.location = 'lower left'
-    assert_equal(3, colorbar.get_location())
-    assert_equal(3, colorbar.location)
+    assert colorbar.get_location() == 3
+    assert colorbar.location == 3
 
-    assert_raises(ValueError, colorbar.set_location, 'blah')
+    with pytest.raises(ValueError):
+        colorbar.set_location('blah')
 
 
 @cleanup
 def test_colorbar_pad():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_pad())
-    assert_is_none(colorbar.pad)
+    assert colorbar.get_pad() is None
+    assert colorbar.pad is None
 
     colorbar.set_pad(4)
-    assert_almost_equal(4, colorbar.get_pad())
-    assert_almost_equal(4, colorbar.pad)
+    assert colorbar.get_pad() == pytest.approx(4.0, abs=1e-2)
+    assert colorbar.pad == pytest.approx(4.0, abs=1e-2)
 
     colorbar.pad = 5
-    assert_almost_equal(5, colorbar.get_pad())
-    assert_almost_equal(5, colorbar.pad)
+    assert colorbar.get_pad() == pytest.approx(5.0, abs=1e-2)
+    assert colorbar.pad == pytest.approx(5.0, abs=1e-2)
 
 
 @cleanup
 def test_colorbar_border_pad():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_border_pad())
-    assert_is_none(colorbar.border_pad)
+    assert colorbar.get_border_pad() is None
+    assert colorbar.border_pad is None
 
     colorbar.set_border_pad(4)
-    assert_almost_equal(4, colorbar.get_border_pad())
-    assert_almost_equal(4, colorbar.border_pad)
+    assert colorbar.get_border_pad() == pytest.approx(4.0, abs=1e-2)
+    assert colorbar.border_pad == pytest.approx(4.0, abs=1e-2)
 
     colorbar.border_pad = 5
-    assert_almost_equal(5, colorbar.get_border_pad())
-    assert_almost_equal(5, colorbar.border_pad)
+    assert colorbar.get_border_pad() == pytest.approx(5.0, abs=1e-2)
+    assert colorbar.border_pad == pytest.approx(5.0, abs=1e-2)
 
 
 @cleanup
 def test_colorbar_box_alpha():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_box_alpha())
-    assert_is_none(colorbar.box_alpha)
+    assert colorbar.get_box_alpha() is None
+    assert colorbar.box_alpha is None
 
     colorbar.set_box_alpha(0.1)
-    assert_almost_equal(0.1, colorbar.get_box_alpha())
-    assert_almost_equal(0.1, colorbar.box_alpha)
+    assert colorbar.get_box_alpha() == pytest.approx(0.1, abs=1e-2)
+    assert colorbar.box_alpha == pytest.approx(0.1, abs=1e-2)
 
     colorbar.box_alpha = 0.2
-    assert_almost_equal(0.2, colorbar.get_box_alpha())
-    assert_almost_equal(0.2, colorbar.box_alpha)
+    assert colorbar.get_box_alpha() == pytest.approx(0.2, abs=1e-2)
+    assert colorbar.box_alpha == pytest.approx(0.2, abs=1e-2)
 
-    assert_raises(ValueError, colorbar.set_box_alpha, -0.1)
-    assert_raises(ValueError, colorbar.set_box_alpha, 1.1)
+    with pytest.raises(ValueError):
+        colorbar.set_box_alpha(-0.1)
+    with pytest.raises(ValueError):
+        colorbar.set_box_alpha(1.1)
 
 
 @cleanup
 def test_colorbar_sep():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_sep())
-    assert_is_none(colorbar.sep)
+    assert colorbar.get_sep() is None
+    assert colorbar.sep is None
 
     colorbar.set_sep(4)
-    assert_almost_equal(4, colorbar.get_sep())
-    assert_almost_equal(4, colorbar.sep)
+    assert colorbar.get_sep() == 4
+    assert colorbar.sep == 4
 
     colorbar.sep = 5
-    assert_almost_equal(5, colorbar.get_sep())
-    assert_almost_equal(5, colorbar.sep)
+    assert colorbar.get_sep() == 5
+    assert colorbar.sep == 5
 
 
 @cleanup
 def test_colorbar_frameon():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_frameon())
-    assert_is_none(colorbar.frameon)
+    assert colorbar.get_frameon() is None
+    assert colorbar.frameon is None
 
     colorbar.set_frameon(True)
-    assert_true(colorbar.get_frameon())
-    assert_true(colorbar.frameon)
+    assert colorbar.get_frameon()
+    assert colorbar.frameon
 
     colorbar.frameon = False
-    assert_false(colorbar.get_frameon())
-    assert_false(colorbar.frameon)
+    assert not colorbar.get_frameon()
+    assert not colorbar.frameon
 
 
 @cleanup
 def test_colorbar_ticks():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_ticks())
-    assert_is_none(colorbar.ticks)
+    assert colorbar.get_ticks() is None
+    assert colorbar.ticks is None
 
     colorbar.set_ticks([0., 0.5, 1.])
-    assert_equal([0., 0.5, 1.], colorbar.get_ticks())
-    assert_equal([0., 0.5, 1.], colorbar.ticks)
+    assert colorbar.get_ticks() == [0., 0.5, 1.]
+    assert colorbar.ticks == [0., 0.5, 1.]
 
     colorbar.ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.get_ticks())
-    assert_equal([0, 0.2, 0.4, 0.6, 0.8, 1], colorbar.ticks)
+    assert colorbar.get_ticks() == [0, 0.2, 0.4, 0.6, 0.8, 1]
+    assert colorbar.ticks == [0, 0.2, 0.4, 0.6, 0.8, 1]
 
 
 @cleanup
@@ -298,59 +304,64 @@ def test_colorbar_ticks_nominimum():
 def test_colorbar_ticklabels():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_ticklabels())
-    assert_is_none(colorbar.ticklabels)
+    assert colorbar.get_ticklabels() is None
+    assert colorbar.ticklabels is None
 
     colorbar.set_ticklabels(['min', 'max'])
-    assert_equal(['min', 'max'], colorbar.get_ticklabels())
-    assert_equal(['min', 'max'], colorbar.ticklabels)
+    assert colorbar.get_ticklabels() == ['min', 'max']
+    assert colorbar.ticklabels == ['min', 'max']
 
     colorbar.ticklabels = ['small', 'big']
-    assert_equal(['small', 'big'], colorbar.get_ticklabels())
-    assert_equal(['small', 'big'], colorbar.ticklabels)
+    assert colorbar.get_ticklabels() == ['small', 'big']
+    assert colorbar.ticklabels == ['small', 'big']
 
     colorbar.ticks = [0., 1.]
-    assert_raises(ValueError, colorbar.set_ticklabels, ['one label', ])
+    with pytest.raises(ValueError):
+        colorbar.set_ticklabels(['one label', ])
 
 
 @cleanup
 def test_colorbar_ticklocation():
     _fig, _ax, colorbar = create_figure()
 
-    assert_is_none(colorbar.get_ticklocation())
-    assert_is_none(colorbar.ticklocation)
+    assert colorbar.get_ticklocation() is None
+    assert colorbar.ticklocation is None
 
     colorbar.set_orientation('horizontal')
     colorbar.set_ticklocation('bottom')
-    assert_equal('bottom', colorbar.get_ticklocation())
-    assert_equal('bottom', colorbar.ticklocation)
+    assert colorbar.get_ticklocation() == 'bottom'
+    assert colorbar.ticklocation == 'bottom'
     colorbar.set_ticklocation(None)
 
     colorbar.set_orientation('horizontal')
     colorbar.set_ticklocation('top')
-    assert_equal('top', colorbar.get_ticklocation())
-    assert_equal('top', colorbar.ticklocation)
+    assert colorbar.get_ticklocation() == 'top'
+    assert colorbar.ticklocation == 'top'
     colorbar.set_ticklocation(None)
 
     colorbar.set_orientation('vertical')
     colorbar.set_ticklocation('left')
-    assert_equal('left', colorbar.get_ticklocation())
-    assert_equal('left', colorbar.ticklocation)
+    assert colorbar.get_ticklocation() == 'left'
+    assert colorbar.ticklocation == 'left'
     colorbar.set_ticklocation(None)
 
     colorbar.set_orientation('vertical')
     colorbar.set_ticklocation('right')
-    assert_equal('right', colorbar.get_ticklocation())
-    assert_equal('right', colorbar.ticklocation)
+    assert colorbar.get_ticklocation() == 'right'
+    assert colorbar.ticklocation == 'right'
     colorbar.set_ticklocation(None)
 
     colorbar.set_orientation('horizontal')
-    assert_raises(ValueError, colorbar.set_ticklocation, 'left')
-    assert_raises(ValueError, colorbar.set_ticklocation, 'right')
+    with pytest.raises(ValueError):
+        colorbar.set_ticklocation('left')
+    with pytest.raises(ValueError):
+        colorbar.set_ticklocation('right')
 
     colorbar.set_orientation('vertical')
-    assert_raises(ValueError, colorbar.set_ticklocation, 'bottom')
-    assert_raises(ValueError, colorbar.set_ticklocation, 'top')
+    with pytest.raises(ValueError):
+        colorbar.set_ticklocation('bottom')
+    with pytest.raises(ValueError):
+        colorbar.set_ticklocation('top')
 
 @cleanup
 def test_colorbar_set_visible():
@@ -366,7 +377,7 @@ def test_colorbar_no_mappable():
     plt.draw()
 
 
-@image_comparison(baseline_images=['example1'], extensions=['png'])
+@image_comparison(baseline_images=['example1'], extensions=['png'], style='mpl20')
 def test_colorbar_example1():
     with cbook.get_sample_data('grace_hopper.png') as fp:
         data = np.array(plt.imread(fp))
@@ -379,7 +390,7 @@ def test_colorbar_example1():
     ax.add_artist(colorbar)
 
 
-@image_comparison(baseline_images=['example2'], extensions=['png'])
+@image_comparison(baseline_images=['example2'], extensions=['png'], style='mpl20')
 def test_colorbar_example2():
     with cbook.get_sample_data('grace_hopper.png') as fp:
         data = np.array(plt.imread(fp))
@@ -392,12 +403,3 @@ def test_colorbar_example2():
     colorbar.set_ticks([-1.0, 0, 1.0])
     ax.add_artist(colorbar)
 
-
-if __name__ == '__main__':
-    import nose
-    import sys
-
-    args = ['-s', '--with-doctest']
-    argv = sys.argv
-    argv = argv[:1] + args + argv[1:]
-    nose.runmodule(argv=argv, exit=False)

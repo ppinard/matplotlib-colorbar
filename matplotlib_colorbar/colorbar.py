@@ -162,7 +162,8 @@ class ColorbarCalculator(object):
         Returns the sequence of ticks (colorbar data locations),
         ticklabels (strings), and the corresponding offset string.
         """
-        return self._base._ticker()
+        locator, formatter = self._base._get_ticker_locator_formatter()
+        return self._base._ticker(locator, formatter)
 
 class Colorbar(Artist):
 
