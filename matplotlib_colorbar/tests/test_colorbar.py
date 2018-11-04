@@ -2,6 +2,7 @@
 """ """
 
 # Standard library modules.
+import sys
 
 # Third party modules.
 import matplotlib.pyplot as plt
@@ -389,7 +390,8 @@ def test_colorbar_example1():
     colorbar.set_ticks([0.0, 0.5, 1.0])
     ax.add_artist(colorbar)
 
-
+@pytest.mark.skipif(sys.version_info < (3, 5),
+                    reason="requires python3.5 or higher")
 @image_comparison(baseline_images=['example2'], extensions=['png'], style='mpl20')
 def test_colorbar_example2():
     with cbook.get_sample_data('grace_hopper.png') as fp:
