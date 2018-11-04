@@ -43,7 +43,7 @@ setup(name='matplotlib-colorbar',
       packages=find_packages(),
       package_data={},
 
-      install_requires=['matplotlib'],
+      install_requires=['matplotlib', 'packaging'],
       setup_requires=['pytest-runner'],
       tests_require=['pytest'],
 

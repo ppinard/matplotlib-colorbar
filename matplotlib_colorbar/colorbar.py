@@ -52,6 +52,8 @@ import numpy as np
 
 import six
 
+import packaging.version
+
 # Local modules.
 
 # Globals and constants variables.
@@ -162,8 +164,14 @@ class ColorbarCalculator(object):
         Returns the sequence of ticks (colorbar data locations),
         ticklabels (strings), and the corresponding offset string.
         """
-        locator, formatter = self._base._get_ticker_locator_formatter()
-        return self._base._ticker(locator, formatter)
+        current_version = packaging.version.parse(matplotlib.__version__)
+        critical_version = packaging.version.parse('3.0.0')
+
+        if current_version > critical_version:
+            locator, formatter = self._base._get_ticker_locator_formatter()
+            return self._base._ticker(locator, formatter)
+        else:
+            return self._base._ticker()
 
 class Colorbar(Artist):
 
