@@ -110,6 +110,9 @@ class ColorbarBase2(ColorbarBase):
     def _config_axes(self, X, Y):
         pass
 
+    def _reset_locator_formatter_scale(self):
+        pass
+
     def config_axis(self):
         pass
 
