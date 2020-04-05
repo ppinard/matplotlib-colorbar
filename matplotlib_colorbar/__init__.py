@@ -9,5 +9,6 @@ __copyright__ = "Copyright (c) 2015-2016 Philippe T. Pinard and collaborators"
 __license__ = "MIT"
 
 from ._version import get_versions
-__version__ = get_versions()['version']
+
+__version__ = get_versions()["version"]
 del get_versions

@@ -16,9 +16,9 @@ from matplotlib_colorbar.colorbar import Colorbar
 
 
 plt.figure()
-data = np.array(plt.imread(cbook.get_sample_data('grace_hopper.png')))
-mappable = plt.imshow(data[..., 0], cmap='viridis')
-colorbar = Colorbar(mappable, location='lower left')
+data = np.array(plt.imread(cbook.get_sample_data("grace_hopper.png")))
+mappable = plt.imshow(data[..., 0], cmap="viridis")
+colorbar = Colorbar(mappable, location="lower left")
 colorbar.set_ticks([0.0, 0.5, 1.0])
 plt.gca().add_artist(colorbar)
-plt.savefig('example1.png', bbox_inches='tight')
+plt.savefig("example1.png", bbox_inches="tight")
