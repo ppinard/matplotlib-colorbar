@@ -7,7 +7,7 @@ Example::
    >>> fig = plt.figure()
    >>> ax = fig.add_axes([0.0, 0.0, 1.0, 1.0])
    >>> mappable = ax.imshow(...)
-   >>> colorbar = ColorBar(mappable)
+   >>> colorbar = Colorbar(mappable)
    >>> ax.add_artist(scalebar)
    >>> plt.show()
 
@@ -25,7 +25,7 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.box_alpha
     - colorbar.ticklocation
 
-See the class documentation (:class:`.ColorBar`) for a description of the
+See the class documentation (:class:`.Colorbar`) for a description of the
 parameters.
 """
 
@@ -34,166 +34,98 @@ import warnings
 
 # Third party modules.
 import matplotlib
-from matplotlib.rcsetup import \
-    (defaultParams, ValidateInStrings, validate_float,
-     validate_legend_loc, validate_bool, validate_color)
+from matplotlib.rcsetup import (
+    defaultParams,
+    ValidateInStrings,
+    validate_float,
+    validate_legend_loc,
+    validate_bool,
+    validate_color,
+)
 from matplotlib.artist import Artist
-from matplotlib.offsetbox import \
-    AnchoredOffsetbox, AuxTransformBox, VPacker, HPacker
+from matplotlib.offsetbox import AnchoredOffsetbox, AuxTransformBox, VPacker, HPacker
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.text import Text
 from matplotlib.font_manager import FontProperties
-from matplotlib.colorbar import ColorbarBase
-import matplotlib.contour as contour
-import matplotlib.ticker as ticker
+from matplotlib.colorbar import colorbar_factory
 
 import numpy as np
-
-import six
-
-import packaging.version
 
 # Local modules.
 
 # Globals and constants variables.
 
-__all__ = ['ColorBar']
+__all__ = ["ColorBar"]
 
 # Setup of extra parameters in the matplotlic rc
-validate_orientation = ValidateInStrings('orientation',
-                                         ['horizontal', 'vertical'])
-validate_ticklocation = ValidateInStrings('orientation',
-                                          ['auto', 'left', 'right', 'bottom', 'top'])
+validate_orientation = ValidateInStrings("orientation", ["horizontal", "vertical"])
+validate_ticklocation = ValidateInStrings(
+    "orientation", ["auto", "left", "right", "bottom", "top"]
+)
 
 defaultParams.update(
-    {'colorbar.orientation': ['vertical', validate_orientation],
-     'colorbar.ticklocation': ['auto', validate_ticklocation],
-     'colorbar.length_fraction': [0.2, validate_float],
-     'colorbar.width_fraction': [0.02, validate_float],
-     'colorbar.location': ['upper right', validate_legend_loc],
-     'colorbar.pad': [0.2, validate_float],
-     'colorbar.border_pad': [0.1, validate_float],
-     'colorbar.sep': [5, validate_float],
-     'colorbar.frameon': [True, validate_bool],
-     'colorbar.color': ['k', validate_color],
-     'colorbar.box_color': ['w', validate_color],
-     'colorbar.box_alpha': [1.0, validate_float],
-     })
+    {
+        "colorbar.orientation": ["vertical", validate_orientation],
+        "colorbar.ticklocation": ["auto", validate_ticklocation],
+        "colorbar.length_fraction": [0.2, validate_float],
+        "colorbar.width_fraction": [0.02, validate_float],
+        "colorbar.location": ["upper right", validate_legend_loc],
+        "colorbar.pad": [0.2, validate_float],
+        "colorbar.border_pad": [0.1, validate_float],
+        "colorbar.sep": [5, validate_float],
+        "colorbar.frameon": [True, validate_bool],
+        "colorbar.color": ["k", validate_color],
+        "colorbar.box_color": ["w", validate_color],
+        "colorbar.box_alpha": [1.0, validate_float],
+    }
+)
 
 # Recreate the validate function
-matplotlib.rcParams.validate = \
-    dict((key, converter) for key, (default, converter) in
-         six.iteritems(defaultParams)
-         if key not in matplotlib._all_deprecated)
+matplotlib.rcParams.validate = dict(
+    (key, converter)
+    for key, (default, converter) in defaultParams.items()
+    if key not in matplotlib._all_deprecated
+)
 
-class ColorbarBase2(ColorbarBase):
-    """
-    Disable some methods from the original :class:`ColorbarBase` class of
-    matplotlib that required an :class:`Axes` object.
-    """
-
-    def _set_label(self):
-        pass
-
-    def _patch_ax(self):
-        pass
-
-    def _config_axes(self, X, Y):
-        pass
-
-    def config_axis(self):
-        pass
-
-    def draw_all(self):
-        pass
-
-class ColorbarCalculator(object):
-    """
-    Internally computes the values to draw a colorbar without actually drawing
-    it as in the original :class:`ColorbarBase` class from matplotlib.
-    """
-
-    def __init__(self, mappable, **kw):
-        # Ensure the given mappable's norm has appropriate vmin and vmax set
-        # even if mappable.draw has not yet been called.
-        mappable.autoscale_None()
-
-        self.mappable = mappable
-        kw['cmap'] = cmap = mappable.cmap
-        kw['norm'] = mappable.norm
-
-        if isinstance(mappable, contour.ContourSet):
-            CS = mappable
-            kw['alpha'] = mappable.get_alpha()
-            kw['boundaries'] = CS._levels
-            kw['values'] = CS.cvalues
-            kw['extend'] = CS.extend
-            #kw['ticks'] = CS._levels
-            kw.setdefault('ticks', ticker.FixedLocator(CS.levels, nbins=10))
-            kw['filled'] = CS.filled
-
-        else:
-            if getattr(cmap, 'colorbar_extend', False) is not False:
-                kw.setdefault('extend', cmap.colorbar_extend)
-
-            if isinstance(mappable, Artist):
-                kw['alpha'] = mappable.get_alpha()
-
-        ticks = kw.pop('ticks', None)
-        ticklabels = kw.pop('ticklabels', None)
-
-        self._base = ColorbarBase2(None, **kw)
-        if ticks:
-            self._base.set_ticks(ticks, update_ticks=False)
-        if ticks and ticklabels:
-            self._base.set_ticklabels(ticklabels, update_ticks=False)
-
-    def calculate_colorbar(self):
-        """
-        Returns the positions and colors of all intervals inside the colorbar.
-        """
-        self._base._process_values()
-        self._base._find_range()
-        X, Y = self._base._mesh()
-        C = self._base._values[:, np.newaxis]
-        return X, Y, C
-
-    def calculate_ticks(self):
-        """
-        Returns the sequence of ticks (colorbar data locations),
-        ticklabels (strings), and the corresponding offset string.
-        """
-        current_version = packaging.version.parse(matplotlib.__version__)
-        critical_version = packaging.version.parse('3.0.0')
-
-        if current_version > critical_version:
-            locator, formatter = self._base._get_ticker_locator_formatter()
-            return self._base._ticker(locator, formatter)
-        else:
-            return self._base._ticker()
 
 class Colorbar(Artist):
 
     zorder = 5
 
-    _LOCATIONS = {'upper right':  1,
-                  'upper left':   2,
-                  'lower left':   3,
-                  'lower right':  4,
-                  'right':        5,
-                  'center left':  6,
-                  'center right': 7,
-                  'lower center': 8,
-                  'upper center': 9,
-                  'center':       10}
+    _LOCATIONS = {
+        "upper right": 1,
+        "upper left": 2,
+        "lower left": 3,
+        "lower right": 4,
+        "right": 5,
+        "center left": 6,
+        "center right": 7,
+        "lower center": 8,
+        "upper center": 9,
+        "center": 10,
+    }
 
-    def __init__(self, mappable=None, label=None, orientation=None,
-                 length_fraction=None, width_fraction=None,
-                 location=None, pad=None, border_pad=None, sep=None,
-                 frameon=None, color=None, box_color=None, box_alpha=None,
-                 font_properties=None, ticks=None, ticklabels=None,
-                 ticklocation=None):
+    def __init__(
+        self,
+        mappable=None,
+        label=None,
+        orientation=None,
+        length_fraction=None,
+        width_fraction=None,
+        location=None,
+        pad=None,
+        border_pad=None,
+        sep=None,
+        frameon=None,
+        color=None,
+        box_color=None,
+        box_alpha=None,
+        font_properties=None,
+        ticks=None,
+        ticklabels=None,
+        ticklocation=None,
+    ):
         """
         Creates a new color bar.
 
@@ -262,11 +194,13 @@ class Colorbar(Artist):
             font_properties = FontProperties()
         elif isinstance(font_properties, dict):
             font_properties = FontProperties(**font_properties)
-        elif isinstance(font_properties, six.string_types):
+        elif isinstance(font_properties, str):
             font_properties = FontProperties(font_properties)
         else:
-            raise TypeError("Unsupported type for `font_properties`. Pass "
-                            "either a dict or a font config pattern as string.")
+            raise TypeError(
+                "Unsupported type for `font_properties`. Pass "
+                "either a dict or a font config pattern as string."
+            )
         self.font_properties = font_properties
 
         self.ticks = ticks
@@ -285,25 +219,26 @@ class Colorbar(Artist):
         def _get_value(attr, default):
             value = getattr(self, attr)
             if value is None:
-                value = rcParams.get('colorbar.' + attr, default)
+                value = rcParams.get("colorbar." + attr, default)
             return value
-        orientation = _get_value('orientation', 'vertical')
-        length_fraction = _get_value('length_fraction', 0.2)
-        width_fraction = _get_value('width_fraction', 0.01)
-        location = _get_value('location', 'upper right')
-        if isinstance(location, six.string_types):
+
+        orientation = _get_value("orientation", "vertical")
+        length_fraction = _get_value("length_fraction", 0.2)
+        width_fraction = _get_value("width_fraction", 0.01)
+        location = _get_value("location", "upper right")
+        if isinstance(location, str):
             location = self._LOCATIONS[location]
-        pad = _get_value('pad', 0.2)
-        border_pad = _get_value('border_pad', 0.1)
-        sep = _get_value('sep', 5)
-        frameon = _get_value('frameon', True)
-        color = _get_value('color', 'k')
-        box_color = _get_value('box_color', 'w')
-        box_alpha = _get_value('box_alpha', 1.0)
+        pad = _get_value("pad", 0.2)
+        border_pad = _get_value("border_pad", 0.1)
+        sep = _get_value("sep", 5)
+        frameon = _get_value("frameon", True)
+        color = _get_value("color", "k")
+        box_color = _get_value("box_color", "w")
+        box_alpha = _get_value("box_alpha", 1.0)
         font_properties = self.font_properties
-        ticklocation = _get_value('ticklocation', 'auto')
-        if ticklocation == 'auto':
-            ticklocation = 'bottom' if orientation == 'horizontal' else 'right'
+        ticklocation = _get_value("ticklocation", "auto")
+        if ticklocation == "auto":
+            ticklocation = "bottom" if orientation == "horizontal" else "right"
 
         mappable = self.mappable
         cmap = self.mappable.get_cmap()
@@ -314,43 +249,44 @@ class Colorbar(Artist):
 
         ax = self.axes
 
-        # Calculate
-        calculator = ColorbarCalculator(mappable, ticks=ticks, ticklabels=ticklabels)
-
-        X, Y, C = calculator.calculate_colorbar()
-        X *= width_fraction
-        Y *= length_fraction
-        widths = np.diff(X, axis=1)[:, 0]
-        heights = np.diff(Y[:, 0])
-        if orientation == 'horizontal':
-            X, Y = Y, X
-            widths, heights = heights, widths
-
-        ticks, ticklabels, offset_string = calculator.calculate_ticks()
-        ticks *= length_fraction
+        # Calculate colorbar
+        (
+            color_positions,
+            color_values,
+            ticks,
+            ticklabels,
+            offset_string,
+        ) = self._calculate_colorbar(length_fraction, mappable, ticks, ticklabels)
 
         # Create colorbar
         colorbarbox = AuxTransformBox(ax.transAxes)
 
+        widths = np.diff(color_positions)
+
         patches = []
-        for x0, y0, width, height in zip(X[:-1, 0], Y[:-1, 0], widths, heights):
-            patch = Rectangle((x0, y0), width, height)
+        for color_position, color_width in zip(color_positions[:-1], widths):
+            if orientation == "horizontal":
+                patch = Rectangle((color_position, 0.0), color_width, width_fraction)
+            else:
+                patch = Rectangle((0.0, color_position), width_fraction, color_width)
             patches.append(patch)
 
-        edgecolors = 'none' #if self.drawedges else 'none'
-        #FIXME: drawedge property
-        #FIXME: Filled property
+        edgecolors = "none"  # if self.drawedges else 'none'
+        # FIXME: drawedge property
+        # FIXME: Filled property
         col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors, norm=norm)
-        col.set_array(C[:, 0])
+        col.set_array(color_values[:, 0])
         colorbarbox.add_artist(col)
 
         # Create outline
-        if orientation == 'horizontal':
-            outline = Rectangle((0, 0), length_fraction, width_fraction,
-                                fill=False, ec=color)
+        if orientation == "horizontal":
+            outline = Rectangle(
+                (0, 0), length_fraction, width_fraction, fill=False, ec=color
+            )
         else:
-            outline = Rectangle((0, 0), width_fraction, length_fraction,
-                                fill=False, ec=color)
+            outline = Rectangle(
+                (0, 0), width_fraction, length_fraction, fill=False, ec=color
+            )
         colorbarbox.add_artist(outline)
 
         # Create ticks and tick labels
@@ -358,43 +294,47 @@ class Colorbar(Artist):
         ticklines = []
         ticktexts = []
         for tick, ticklabel in zip(ticks, ticklabels):
-            if ticklocation == 'bottom':
+            if ticklocation == "bottom":
                 x0 = x1 = xtext = tick
                 y0 = w10th
                 y1 = -w10th
                 ytext = -2 * w10th
-                ha = 'center'
-                va = 'top'
-            elif ticklocation == 'top':
+                ha = "center"
+                va = "top"
+            elif ticklocation == "top":
                 x0 = x1 = xtext = tick
                 y0 = width_fraction - w10th
                 y1 = width_fraction + w10th
                 ytext = width_fraction + 2 * w10th
-                ha = 'center'
-                va = 'bottom'
-            elif ticklocation == 'left':
+                ha = "center"
+                va = "bottom"
+            elif ticklocation == "left":
                 x0 = w10th
                 x1 = -w10th
                 xtext = -2 * w10th
                 y0 = y1 = ytext = tick
-                ha = 'right'
-                va = 'center'
-            elif ticklocation == 'right':
+                ha = "right"
+                va = "center"
+            elif ticklocation == "right":
                 x0 = width_fraction - w10th
                 x1 = width_fraction + w10th
                 xtext = width_fraction + 2 * w10th
                 y0 = y1 = ytext = tick
-                ha = 'left'
-                va = 'center'
+                ha = "left"
+                va = "center"
 
             ticklines.append([(x0, y0), (x1, y1)])
 
             ticklabel = offset_string + ticklabel
-            ticktext = Text(xtext, ytext, ticklabel,
-                            color=color,
-                            fontproperties=font_properties,
-                            horizontalalignment=ha,
-                            verticalalignment=va)
+            ticktext = Text(
+                xtext,
+                ytext,
+                ticklabel,
+                color=color,
+                fontproperties=font_properties,
+                horizontalalignment=ha,
+                verticalalignment=va,
+            )
             ticktexts.append(ticktext)
 
         col = LineCollection(ticklines, color=color)
@@ -407,41 +347,93 @@ class Colorbar(Artist):
         if label:
             labelbox = AuxTransformBox(ax.transAxes)
 
-            va = 'baseline' if orientation == 'horizontal' else 'center'
-            text = Text(0, 0, label,
-                        fontproperties=font_properties,
-                        verticalalignment=va,
-                        rotation=orientation,
-                        color=color)
+            va = "baseline" if orientation == "horizontal" else "center"
+            text = Text(
+                0,
+                0,
+                label,
+                fontproperties=font_properties,
+                verticalalignment=va,
+                rotation=orientation,
+                color=color,
+            )
             labelbox.add_artist(text)
         else:
             labelbox = None
 
         # Create final offset box
-        if ticklocation == 'bottom':
+        if ticklocation == "bottom":
             children = [colorbarbox, labelbox] if labelbox else [colorbarbox]
-            child = VPacker(children=children, align='center', pad=0, sep=sep)
-        elif ticklocation == 'top':
+            child = VPacker(children=children, align="center", pad=0, sep=sep)
+        elif ticklocation == "top":
             children = [labelbox, colorbarbox] if labelbox else [colorbarbox]
-            child = VPacker(children=children, align='center', pad=0, sep=sep)
-        elif ticklocation == 'left':
+            child = VPacker(children=children, align="center", pad=0, sep=sep)
+        elif ticklocation == "left":
             children = [labelbox, colorbarbox] if labelbox else [colorbarbox]
-            child = HPacker(children=children, align='center', pad=0, sep=sep)
-        elif ticklocation == 'right':
+            child = HPacker(children=children, align="center", pad=0, sep=sep)
+        elif ticklocation == "right":
             children = [colorbarbox, labelbox] if labelbox else [colorbarbox]
-            child = HPacker(children=children, align='center', pad=0, sep=sep)
-#
-        box = AnchoredOffsetbox(loc=location,
-                                pad=pad,
-                                borderpad=border_pad,
-                                child=child,
-                                frameon=frameon)
+            child = HPacker(children=children, align="center", pad=0, sep=sep)
+        #
+        box = AnchoredOffsetbox(
+            loc=location, pad=pad, borderpad=border_pad, child=child, frameon=frameon
+        )
 
         box.axes = ax
         box.set_figure(self.get_figure())
         box.patch.set_color(box_color)
         box.patch.set_alpha(box_alpha)
         box.draw(renderer)
+
+    def _calculate_colorbar(
+        self, length_fraction, mappable, ticks=None, ticklabels=None,
+    ):
+        """
+        Returns the positions, colors of all intervals inside the colorbar, 
+        and tick and ticklabels.
+        """
+        # Create dummy figure, axes and colorbar
+        fig_dummy = matplotlib.figure.Figure()
+
+        try:
+            # Create dummy colorbar
+            ax_dummy = fig_dummy.add_axes([0.0, 0.0, 1.0, 1.0])
+            colorbar_dummy = colorbar_factory(ax_dummy, mappable)
+
+            # Set ticks
+            if ticks:
+                colorbar_dummy.set_ticks(ticks)
+            if ticks and ticklabels:
+                colorbar_dummy.set_ticklabels(ticklabels)
+
+            colorbar_dummy.draw_all()
+
+            # Extract color position and values
+            _X, Y = colorbar_dummy._mesh()
+            color_positions = Y[:, 0]
+            color_values = colorbar_dummy._values[:, np.newaxis]
+
+            # Extract ticks
+            locator, formatter = colorbar_dummy._get_ticker_locator_formatter()
+            ticks, ticklabels, offset_string = colorbar_dummy._ticker(
+                locator, formatter
+            )
+
+            # Rescale
+            ticks = (
+                (ticks - np.min(color_positions))
+                / np.ptp(color_positions)
+                * length_fraction
+            )
+            color_positions = (
+                (color_positions - np.min(color_positions))
+                / np.ptp(color_positions)
+                * length_fraction
+            )
+
+            return color_positions, color_values, ticks, ticklabels, offset_string
+        finally:
+            del fig_dummy
 
     def get_mappable(self):
         return self._mappable
@@ -463,9 +455,8 @@ class Colorbar(Artist):
         return self._orientation
 
     def set_orientation(self, orientation):
-        if orientation is not None and \
-                orientation not in ['vertical', 'horizontal']:
-            raise ValueError('Unknown orientation: %s' % orientation)
+        if orientation is not None and orientation not in ["vertical", "horizontal"]:
+            raise ValueError("Unknown orientation: %s" % orientation)
         self._check_ticklocation(orientation=orientation)
         self._orientation = orientation
 
@@ -478,7 +469,7 @@ class Colorbar(Artist):
         if fraction is not None:
             fraction = float(fraction)
             if fraction <= 0.0 or fraction > 1.0:
-                raise ValueError('Length fraction must be between ]0.0, 1.0]')
+                raise ValueError("Length fraction must be between ]0.0, 1.0]")
         self._length_fraction = fraction
 
     length_fraction = property(get_length_fraction, set_length_fraction)
@@ -490,7 +481,7 @@ class Colorbar(Artist):
         if fraction is not None:
             fraction = float(fraction)
             if fraction <= 0.0 or fraction > 1.0:
-                raise ValueError('Width fraction must be between ]0.0, 1.0]')
+                raise ValueError("Width fraction must be between ]0.0, 1.0]")
         self._width_fraction = fraction
 
     width_fraction = property(get_width_fraction, set_width_fraction)
@@ -499,9 +490,9 @@ class Colorbar(Artist):
         return self._location
 
     def set_location(self, loc):
-        if isinstance(loc, six.string_types):
+        if isinstance(loc, str):
             if loc not in self._LOCATIONS:
-                raise ValueError('Unknown location code: %s' % loc)
+                raise ValueError("Unknown location code: %s" % loc)
             loc = self._LOCATIONS[loc]
         self._location = loc
 
@@ -562,7 +553,7 @@ class Colorbar(Artist):
         if alpha is not None:
             alpha = float(alpha)
             if alpha < 0.0 or alpha > 1.0:
-                raise ValueError('Alpha must be between [0.0, 1.0]')
+                raise ValueError("Alpha must be between [0.0, 1.0]")
         self._box_alpha = alpha
 
     box_alpha = property(get_box_alpha, set_box_alpha)
@@ -589,26 +580,27 @@ class Colorbar(Artist):
     def set_ticklabels(self, ticklabels):
         if ticklabels is not None:
             if self.ticks and len(self.ticks) != len(ticklabels):
-                raise ValueError("Ticklabels must be the same length as "
-                                 "ticks")
+                raise ValueError("Ticklabels must be the same length as " "ticks")
         self._ticklabels = ticklabels
 
     ticklabels = property(get_ticklabels, set_ticklabels)
 
     def _check_ticklocation(self, loc=None, orientation=None):
         if loc is None:
-            loc = getattr(self, 'ticklocation', None) # late definition
+            loc = getattr(self, "ticklocation", None)  # late definition
         if orientation is None:
-            orientation = getattr(self, 'orientation', None) # late definition
+            orientation = getattr(self, "orientation", None)  # late definition
 
-        if loc is None or loc == 'auto':
+        if loc is None or loc == "auto":
             return
-        if orientation == 'vertical' and loc not in ['left', 'right']:
-            raise ValueError('Location must be either "left" or "right"'
-                             'for vertical orientation')
-        if orientation == 'horizontal' and loc not in ['top', 'bottom']:
-            raise ValueError('Location must be either "top" or "bottom"'
-                             'for horizontal orientation')
+        if orientation == "vertical" and loc not in ["left", "right"]:
+            raise ValueError(
+                'Location must be either "left" or "right"' "for vertical orientation"
+            )
+        if orientation == "horizontal" and loc not in ["top", "bottom"]:
+            raise ValueError(
+                'Location must be either "top" or "bottom"' "for horizontal orientation"
+            )
 
     def get_ticklocation(self):
         return self._ticklocation
@@ -619,7 +611,7 @@ class Colorbar(Artist):
 
     ticklocation = property(get_ticklocation, set_ticklocation)
 
-def ColorBar(*args, **kwargs): # pragma: no cover
+
+def ColorBar(*args, **kwargs):  # pragma: no cover
     warnings.warn("Class is deprecated. Use Colorbar(...) instead", DeprecationWarning)
     return Colorbar(*args, **kwargs)
-
