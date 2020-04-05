@@ -54,10 +54,6 @@ import matplotlib.ticker as ticker
 
 import numpy as np
 
-import six
-
-import packaging.version
-
 # Local modules.
 
 # Globals and constants variables.
@@ -90,7 +86,7 @@ defaultParams.update(
 # Recreate the validate function
 matplotlib.rcParams.validate = dict(
     (key, converter)
-    for key, (default, converter) in six.iteritems(defaultParams)
+    for key, (default, converter) in defaultParams.items()
     if key not in matplotlib._all_deprecated
 )
 
@@ -176,14 +172,8 @@ class ColorbarCalculator(object):
         Returns the sequence of ticks (colorbar data locations),
         ticklabels (strings), and the corresponding offset string.
         """
-        current_version = packaging.version.parse(matplotlib.__version__)
-        critical_version = packaging.version.parse("3.0.0")
-
-        if current_version > critical_version:
-            locator, formatter = self._base._get_ticker_locator_formatter()
-            return self._base._ticker(locator, formatter)
-        else:
-            return self._base._ticker()
+        locator, formatter = self._base._get_ticker_locator_formatter()
+        return self._base._ticker(locator, formatter)
 
 
 class Colorbar(Artist):
@@ -291,7 +281,7 @@ class Colorbar(Artist):
             font_properties = FontProperties()
         elif isinstance(font_properties, dict):
             font_properties = FontProperties(**font_properties)
-        elif isinstance(font_properties, six.string_types):
+        elif isinstance(font_properties, str):
             font_properties = FontProperties(font_properties)
         else:
             raise TypeError(
@@ -323,7 +313,7 @@ class Colorbar(Artist):
         length_fraction = _get_value("length_fraction", 0.2)
         width_fraction = _get_value("width_fraction", 0.01)
         location = _get_value("location", "upper right")
-        if isinstance(location, six.string_types):
+        if isinstance(location, str):
             location = self._LOCATIONS[location]
         pad = _get_value("pad", 0.2)
         border_pad = _get_value("border_pad", 0.1)
@@ -538,7 +528,7 @@ class Colorbar(Artist):
         return self._location
 
     def set_location(self, loc):
-        if isinstance(loc, six.string_types):
+        if isinstance(loc, str):
             if loc not in self._LOCATIONS:
                 raise ValueError("Unknown location code: %s" % loc)
             loc = self._LOCATIONS[loc]
