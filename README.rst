@@ -91,8 +91,10 @@ Release notes
 0.4
 ^^^
 
-* Fix bug with matplotlib 3.2
+* Fix bug with matplotlib 3.x
 * Remove support for Python 2 and matplotlib < 3
+* Use pytest-mpl for testing
+* Use black code style
 
 0.3.6
 ^^^^^
