@@ -48,9 +48,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.text import Text
 from matplotlib.font_manager import FontProperties
-from matplotlib.colorbar import ColorbarBase
-import matplotlib.contour as contour
-import matplotlib.ticker as ticker
+from matplotlib.colorbar import colorbar_factory
 
 import numpy as np
 
@@ -89,91 +87,6 @@ matplotlib.rcParams.validate = dict(
     for key, (default, converter) in defaultParams.items()
     if key not in matplotlib._all_deprecated
 )
-
-
-class ColorbarBase2(ColorbarBase):
-    """
-    Disable some methods from the original :class:`ColorbarBase` class of
-    matplotlib that required an :class:`Axes` object.
-    """
-
-    def _set_label(self):
-        pass
-
-    def _patch_ax(self):
-        pass
-
-    def _config_axes(self, X, Y):
-        pass
-
-    def _reset_locator_formatter_scale(self):
-        pass
-
-    def config_axis(self):
-        pass
-
-    def draw_all(self):
-        pass
-
-
-class ColorbarCalculator(object):
-    """
-    Internally computes the values to draw a colorbar without actually drawing
-    it as in the original :class:`ColorbarBase` class from matplotlib.
-    """
-
-    def __init__(self, mappable, **kw):
-        # Ensure the given mappable's norm has appropriate vmin and vmax set
-        # even if mappable.draw has not yet been called.
-        mappable.autoscale_None()
-
-        self.mappable = mappable
-        kw["cmap"] = cmap = mappable.cmap
-        kw["norm"] = mappable.norm
-
-        if isinstance(mappable, contour.ContourSet):
-            CS = mappable
-            kw["alpha"] = mappable.get_alpha()
-            kw["boundaries"] = CS._levels
-            kw["values"] = CS.cvalues
-            kw["extend"] = CS.extend
-            # kw['ticks'] = CS._levels
-            kw.setdefault("ticks", ticker.FixedLocator(CS.levels, nbins=10))
-            kw["filled"] = CS.filled
-
-        else:
-            if getattr(cmap, "colorbar_extend", False) is not False:
-                kw.setdefault("extend", cmap.colorbar_extend)
-
-            if isinstance(mappable, Artist):
-                kw["alpha"] = mappable.get_alpha()
-
-        ticks = kw.pop("ticks", None)
-        ticklabels = kw.pop("ticklabels", None)
-
-        self._base = ColorbarBase2(None, **kw)
-        if ticks:
-            self._base.set_ticks(ticks, update_ticks=False)
-        if ticks and ticklabels:
-            self._base.set_ticklabels(ticklabels, update_ticks=False)
-
-    def calculate_colorbar(self):
-        """
-        Returns the positions and colors of all intervals inside the colorbar.
-        """
-        self._base._process_values()
-        self._base._find_range()
-        X, Y = self._base._mesh()
-        C = self._base._values[:, np.newaxis]
-        return X, Y, C
-
-    def calculate_ticks(self):
-        """
-        Returns the sequence of ticks (colorbar data locations),
-        ticklabels (strings), and the corresponding offset string.
-        """
-        locator, formatter = self._base._get_ticker_locator_formatter()
-        return self._base._ticker(locator, formatter)
 
 
 class Colorbar(Artist):
@@ -336,23 +249,16 @@ class Colorbar(Artist):
 
         ax = self.axes
 
-        # Calculate
-        calculator = ColorbarCalculator(mappable, ticks=ticks, ticklabels=ticklabels)
-
-        X, Y, C = calculator.calculate_colorbar()
-        X *= width_fraction
-        Y *= length_fraction
-        widths = np.diff(X, axis=1)[:, 0]
-        heights = np.diff(Y[:, 0])
-        if orientation == "horizontal":
-            X, Y = Y, X
-            widths, heights = heights, widths
-
-        ticks, ticklabels, offset_string = calculator.calculate_ticks()
-        ticks *= length_fraction
+        # Calculate colorbar
+        X, Y, C, ticks, ticklabels, offset_string = self._calculate_colorbar(
+            width_fraction, length_fraction, orientation, mappable, ticks, ticklabels
+        )
 
         # Create colorbar
         colorbarbox = AuxTransformBox(ax.transAxes)
+
+        widths = np.diff(X, axis=1)[:, 0]
+        heights = np.diff(Y[:, 0])
 
         patches = []
         for x0, y0, width, height in zip(X[:-1, 0], Y[:-1, 0], widths, heights):
@@ -472,6 +378,54 @@ class Colorbar(Artist):
         box.patch.set_color(box_color)
         box.patch.set_alpha(box_alpha)
         box.draw(renderer)
+
+    def _calculate_colorbar(
+        self,
+        width_fraction,
+        length_fraction,
+        orientation,
+        mappable,
+        ticks=None,
+        ticklabels=None,
+    ):
+        """
+        Returns the positions, colors of all intervals inside the colorbar, 
+        and tick and ticklabels.
+        """
+        # Create dummy figure, axes and colorbar
+        fig_dummy = matplotlib.figure.Figure()
+
+        try:
+            # Create dummy colorbar
+            ax_dummy = fig_dummy.add_axes([0.0, 0.0, 1.0, 1.0])
+            colorbar_dummy = colorbar_factory(ax_dummy, mappable)
+
+            X, Y = colorbar_dummy._mesh()
+            C = colorbar_dummy._values[:, np.newaxis]
+
+            # Set ticks
+            if ticks:
+                colorbar_dummy.set_ticks(ticks, update_ticks=False)
+            if ticks and ticklabels:
+                colorbar_dummy.set_ticklabels(ticklabels, update_ticks=False)
+
+            locator, formatter = colorbar_dummy._get_ticker_locator_formatter()
+            ticks, ticklabels, offset_string = colorbar_dummy._ticker(
+                locator, formatter
+            )
+
+            # Rescale
+            ticks *= length_fraction / np.ptp(Y)
+            X *= width_fraction / np.ptp(X)
+            Y *= length_fraction / np.ptp(Y)
+
+            # Swap
+            if orientation == "horizontal":
+                X, Y = Y, X
+
+            return X, Y, C, ticks, ticklabels, offset_string
+        finally:
+            del fig_dummy
 
     def get_mappable(self):
         return self._mappable
