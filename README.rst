@@ -88,6 +88,12 @@ Here are parameters that can be customized in the matplotlibrc file.
 
 Release notes
 -------------
+0.4
+^^^
+
+* Fix bug with matplotlib 3.2
+* Remove support for Python 2 and matplotlib < 3
+
 0.3.6
 ^^^^^
 
