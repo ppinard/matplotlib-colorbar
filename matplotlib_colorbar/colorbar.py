@@ -7,7 +7,7 @@ Example::
    >>> fig = plt.figure()
    >>> ax = fig.add_axes([0.0, 0.0, 1.0, 1.0])
    >>> mappable = ax.imshow(...)
-   >>> colorbar = ColorBar(mappable)
+   >>> colorbar = Colorbar(mappable)
    >>> ax.add_artist(scalebar)
    >>> plt.show()
 
@@ -25,7 +25,7 @@ The following parameters are available for customization in the matplotlibrc:
     - colorbar.box_alpha
     - colorbar.ticklocation
 
-See the class documentation (:class:`.ColorBar`) for a description of the
+See the class documentation (:class:`.Colorbar`) for a description of the
 parameters.
 """
 
