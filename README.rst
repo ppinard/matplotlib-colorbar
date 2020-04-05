@@ -1,14 +1,11 @@
 matplotlib-colorbar
 ===================
 
-.. image:: https://travis-ci.org/ppinard/matplotlib-colorbar.svg
-   :target: https://travis-ci.org/ppinard/matplotlib-colorbar
+.. image:: https://img.shields.io/github/workflow/status/ppinard/matplotlib-colorbar/CI
+   :alt: GitHub Workflow Status
 
-.. image:: https://badge.fury.io/py/matplotlib-colorbar.svg
-   :target: http://badge.fury.io/py/matplotlib-colorbar
-
-.. image:: https://codecov.io/github/ppinard/matplotlib-colorbar/coverage.svg?branch=master
-   :target: https://codecov.io/github/ppinard/matplotlib-colorbar?branch=master
+.. image:: https://img.shields.io/pypi/v/matplotlib-colorbar
+   :alt: PyPI
    
 Provides a new artist for matplotlib to display a colorbar,
 instead of an axis as it is the default in matplotlib.
