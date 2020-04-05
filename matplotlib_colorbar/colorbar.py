@@ -250,26 +250,34 @@ class Colorbar(Artist):
         ax = self.axes
 
         # Calculate colorbar
-        X, Y, C, ticks, ticklabels, offset_string = self._calculate_colorbar(
-            width_fraction, length_fraction, orientation, mappable, ticks, ticklabels
+        (
+            color_positions,
+            color_values,
+            ticks,
+            ticklabels,
+            offset_string,
+        ) = self._calculate_colorbar(
+            length_fraction, orientation, mappable, ticks, ticklabels
         )
 
         # Create colorbar
         colorbarbox = AuxTransformBox(ax.transAxes)
 
-        widths = np.diff(X, axis=1)[:, 0]
-        heights = np.diff(Y[:, 0])
+        widths = np.diff(color_positions)
 
         patches = []
-        for x0, y0, width, height in zip(X[:-1, 0], Y[:-1, 0], widths, heights):
-            patch = Rectangle((x0, y0), width, height)
+        for color_position, color_width in zip(color_positions[:-1], widths):
+            if orientation == "horizontal":
+                patch = Rectangle((color_position, 0.0), color_width, width_fraction)
+            else:
+                patch = Rectangle((0.0, color_position), width_fraction, color_width)
             patches.append(patch)
 
         edgecolors = "none"  # if self.drawedges else 'none'
         # FIXME: drawedge property
         # FIXME: Filled property
         col = PatchCollection(patches, cmap=cmap, edgecolors=edgecolors, norm=norm)
-        col.set_array(C[:, 0])
+        col.set_array(color_values[:, 0])
         colorbarbox.add_artist(col)
 
         # Create outline
@@ -380,13 +388,7 @@ class Colorbar(Artist):
         box.draw(renderer)
 
     def _calculate_colorbar(
-        self,
-        width_fraction,
-        length_fraction,
-        orientation,
-        mappable,
-        ticks=None,
-        ticklabels=None,
+        self, length_fraction, orientation, mappable, ticks=None, ticklabels=None,
     ):
         """
         Returns the positions, colors of all intervals inside the colorbar, 
@@ -400,30 +402,38 @@ class Colorbar(Artist):
             ax_dummy = fig_dummy.add_axes([0.0, 0.0, 1.0, 1.0])
             colorbar_dummy = colorbar_factory(ax_dummy, mappable)
 
-            X, Y = colorbar_dummy._mesh()
-            C = colorbar_dummy._values[:, np.newaxis]
-
             # Set ticks
             if ticks:
-                colorbar_dummy.set_ticks(ticks, update_ticks=False)
+                colorbar_dummy.set_ticks(ticks)
             if ticks and ticklabels:
-                colorbar_dummy.set_ticklabels(ticklabels, update_ticks=False)
+                colorbar_dummy.set_ticklabels(ticklabels)
 
+            colorbar_dummy.draw_all()
+
+            # Extract color position and values
+            _X, Y = colorbar_dummy._mesh()
+            color_positions = Y[:, 0]
+            color_values = colorbar_dummy._values[:, np.newaxis]
+
+            # Extract ticks
             locator, formatter = colorbar_dummy._get_ticker_locator_formatter()
             ticks, ticklabels, offset_string = colorbar_dummy._ticker(
                 locator, formatter
             )
 
             # Rescale
-            ticks *= length_fraction / np.ptp(Y)
-            X *= width_fraction / np.ptp(X)
-            Y *= length_fraction / np.ptp(Y)
+            ticks = (
+                (ticks - np.min(color_positions))
+                / np.ptp(color_positions)
+                * length_fraction
+            )
+            color_positions = (
+                (color_positions - np.min(color_positions))
+                / np.ptp(color_positions)
+                * length_fraction
+            )
 
-            # Swap
-            if orientation == "horizontal":
-                X, Y = Y, X
-
-            return X, Y, C, ticks, ticklabels, offset_string
+            return color_positions, color_values, ticks, ticklabels, offset_string
         finally:
             del fig_dummy
 
