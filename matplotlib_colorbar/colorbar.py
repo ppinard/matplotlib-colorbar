@@ -256,9 +256,7 @@ class Colorbar(Artist):
             ticks,
             ticklabels,
             offset_string,
-        ) = self._calculate_colorbar(
-            length_fraction, orientation, mappable, ticks, ticklabels
-        )
+        ) = self._calculate_colorbar(length_fraction, mappable, ticks, ticklabels)
 
         # Create colorbar
         colorbarbox = AuxTransformBox(ax.transAxes)
@@ -388,7 +386,7 @@ class Colorbar(Artist):
         box.draw(renderer)
 
     def _calculate_colorbar(
-        self, length_fraction, orientation, mappable, ticks=None, ticklabels=None,
+        self, length_fraction, mappable, ticks=None, ticklabels=None,
     ):
         """
         Returns the positions, colors of all intervals inside the colorbar, 
